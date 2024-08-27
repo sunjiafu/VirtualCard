@@ -117,7 +117,7 @@ class VirtualCardController extends Controller
 
         $card = VirtualCard::findOrFail($id);
         $card->city = $city;
-        $card->sate = $state;
+        $card->state = $state;
         $card->address = $address;
         $card->zip_code =$zip_code;
         $card->card_pan = $request->card_pan;
