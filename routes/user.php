@@ -58,10 +58,16 @@ Route::prefix("user")->name("user.")->group(function(){
          //coingate
          Route::match(['get','post'],'coingate/success/response/{gateway}','coinGateSuccess')->name('coingate.payment.success');
          Route::match(['get','post'],"coingate/cancel/response/{gateway}",'coinGateCancel')->name('coingate.payment.cancel');
+
+         //EpUsdt相关路由
+         Route::get('epusdt/callback', 'epusdtCallback')->name('epusdt.callback');
+         Route::post('epusdt/notify', 'epusdtNotify')->name('epusdt.notify');
+         
         //Tatum
         Route::prefix('payment')->name('payment.')->group(function() {
             Route::get('crypto/address/{trx_id}','cryptoPaymentAddress')->name('crypto.address');
             Route::post('crypto/confirm/{trx_id}','cryptoPaymentConfirm')->name('crypto.confirm');
+        
         });
         // Perfect Money
         Route::get('redirect/form/{gateway}', 'redirectUsingHTMLForm')->name('payment.redirect.form')->withoutMiddleware(['auth','verification.guard','user.google.two.factor']);
@@ -75,8 +81,8 @@ Route::prefix("user")->name("user.")->group(function(){
         Route::get("cancel/response/{gateway}",'cancelGlobal')->name('payment.global.cancel');
 
         // POST Route For Unauthenticated Request
-        Route::post('success/response/{gateway}', 'postSuccess')->name('payment.global.success')->withoutMiddleware(['auth','verification.guard','user.google.two.factor']);
-        Route::post('cancel/response/{gateway}', 'postCancel')->name('payment.global.cancel')->withoutMiddleware(['auth','verification.guard','user.google.two.factor']);
+        Route::post('success/response/{gateway}', 'postSuccess')->name('payment.global.success.post')->withoutMiddleware(['auth','verification.guard','user.google.two.factor']);
+        Route::post('cancel/response/{gateway}', 'postCancel')->name('payment.global.cancel.post')->withoutMiddleware(['auth','verification.guard','user.google.two.factor']);
         //pagadito
         Route::get('success/{gateway}','successPagadito')->name('payment.success.pagadito')->withoutMiddleware(['web','auth','verification.guard','user.google.two.factor','auth:api','api.user.verification.guard']);
 

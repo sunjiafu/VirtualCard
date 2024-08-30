@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Str;
 use App\Traits\PaymentGateway\FlutterwaveTrait;
+use App\Traits\PaymentGateway\EpusdtTrait;
 use App\Traits\PaymentGateway\RazorTrait;
 use App\Traits\PaymentGateway\SslcommerzTrait;
 use App\Traits\PaymentGateway\QrpayTrait;
@@ -28,7 +29,7 @@ use App\Traits\PaymentGateway\PagaditoTrait;
 
 class PaymentGateway {
 
-    use Paypal,Stripe,Manual,FlutterwaveTrait,RazorTrait,SslcommerzTrait,QrpayTrait,CoinGate,Tatum,PerfectMoney,PagaditoTrait;
+    use Paypal,Stripe,Manual,FlutterwaveTrait,RazorTrait,SslcommerzTrait,QrpayTrait,CoinGate,Tatum,PerfectMoney,PagaditoTrait,EpusdtTrait;
 
     protected $request_data;
     protected $output;

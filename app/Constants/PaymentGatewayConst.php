@@ -58,6 +58,8 @@ class PaymentGatewayConst {
     const TATUM                     = 'tatum';
     const PERFECT_MONEY             = 'perfect-money';
     const PAGADITO                  = 'pagadito';
+    const EPUSDT                       = 'epusdt';
+
 
 
     const SEND = "SEND";
@@ -85,7 +87,8 @@ class PaymentGatewayConst {
             self::COINGATE  => 'coingateInit',
             self::TATUM         => 'tatumInit',
             self::PERFECT_MONEY => 'perfectMoneyInit',
-            self::PAGADITO      => 'pagaditoInit'
+            self::PAGADITO      => 'pagaditoInit',
+            self::EPUSDT          => 'epusdtInit' 
         ];
 
         if($alias == null) {

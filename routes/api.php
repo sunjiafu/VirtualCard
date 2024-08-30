@@ -75,6 +75,8 @@ Route::controller(AddMoneyController::class)->prefix("add-money")->group(functio
     //Perfect Money
     Route::get('perfect/success/response/{gateway}','perfectSuccess')->name('api.add-money.perfect.success');
     Route::get("perfect/cancel/response/{gateway}",'perfectCancel')->name('api.add-money.perfect.cancel');
+
+
 });
 
 
@@ -192,8 +194,8 @@ Route::prefix('user')->group(function(){
                 Route::get("cancel/response/{gateway}",'cancelGlobal')->withoutMiddleware(['auth:api','auth.api','CheckStatusApiUser'])->name("api.user.add.money.payment.global.cancel");
 
                 // POST Route For Unauthenticated Request
-                Route::post('success/response/{gateway}', 'postSuccess')->name('api.user.add.money.payment.global.success')->withoutMiddleware(['auth:api','auth.api','CheckStatusApiUser']);
-                Route::post('cancel/response/{gateway}', 'postCancel')->name('api.user.add.money.payment.global.cancel')->withoutMiddleware(['auth:api','auth.api','CheckStatusApiUser']);
+                Route::post('success/response/{gateway}', 'postSuccess')->name('api.user.add.money.payment.global.success.post')->withoutMiddleware(['auth:api','auth.api','CheckStatusApiUser']);
+                Route::post('cancel/response/{gateway}', 'postCancel')->name('api.user.add.money.payment.global.cancel.post')->withoutMiddleware(['auth:api','auth.api','CheckStatusApiUser']);
             });
             //gift card
             Route::controller(GiftCardController::class)->prefix('gift-card')->group(function(){

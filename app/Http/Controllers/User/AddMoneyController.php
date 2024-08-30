@@ -13,6 +13,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Admin\PaymentGateway;
 use App\Traits\PaymentGateway\Manual;
 use App\Traits\PaymentGateway\Stripe;
+use App\Traits\PaymentGateway\EpusdtTrait; 
 use App\Constants\PaymentGatewayConst;
 use App\Http\Helpers\Api\Helpers;
 use Illuminate\Support\Facades\Session;
@@ -34,7 +35,7 @@ use Illuminate\Http\RedirectResponse;
 
 class AddMoneyController extends Controller
 {
-    use Stripe,Manual,FlutterwaveTrait,RazorTrait,SslcommerzTrait,QrpayTrait;
+    use Stripe,Manual,FlutterwaveTrait,RazorTrait,SslcommerzTrait,QrpayTrait,EpusdtTrait;
 
     public function index() {
         $page_title = __("Add Money");
