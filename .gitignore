@@ -15,5 +15,6 @@ npm-debug.log
 yarn-error.log
 /.fleet
 /.idea
+/storage/debugbar/
 /.vscode
 storage/framework/sessions/*
