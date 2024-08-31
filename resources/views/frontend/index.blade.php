@@ -71,6 +71,7 @@
     End Statistics section
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
 <!-- testimonial-section  -->
+@include('frontend.sections.testimonial')
 <!-- End section -->
 <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Start Call-to-action
