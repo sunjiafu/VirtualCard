@@ -54,7 +54,7 @@
                 </div>
                 <div class="contact-widget-box d-flex mt-3">
                     <div class="contact-icon">
-                        <i class="las la-phone-volume"></i>
+                        <i class="lab la-telegram"></i>
                     </div>
                     <div class="contact-containt">
                         <h4 class="title">{{ __("Mobile Number") }}</h4>
