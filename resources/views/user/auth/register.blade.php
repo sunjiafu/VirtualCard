@@ -58,6 +58,9 @@
                                 'placeholder'   => "password",
                                 'value'         => old("register_password"),
                             ])
+                            <div class="password-hint mt-2 text-muted">
+        <small>密码必须包含至少8个字符，包括大小写字母、数字和特殊符号。</small>
+    </div>
                         </div>
                         <div class="col-lg-12 form-group">
                             <div class="form-group custom-check-group mb-0">
