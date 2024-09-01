@@ -171,6 +171,9 @@ return [
     |
     */
 
-    'attributes' => [],
+    'attributes' => [
+
+        'register password' =>'密码',
+    ],
 
 ];
