@@ -24,7 +24,7 @@
                     <div class="col-lg-12 form-group show_hide_password">
                         <input type="password" name="password" class="form-control form--control  "  placeholder="{{ __("password") }}" required value="{{ @$app_mode == 'demo' ? 'appdevs':'' }}">
                         <a href="javascript:void(0)" class="show-pass"><i class="fa fa-eye-slash" aria-hidden="true"></i></a>
-                        <small class="text-muted" style="color: red;">密码必须包含至少8个字符，包括大小写字母、数字和特殊符号。</small>
+                       
 
                     </div>
                     <div class="col-lg-12 form-group">
@@ -76,7 +76,9 @@
                     <div class="col-lg-12 form-group show_hide_password">
                             <input type="password" name="register_password" class="form-control form--control" required placeholder="{{ __("password") }}">
                             <a href="javascript:void(0)" class="show-pass"><i class="fa fa-eye-slash" aria-hidden="true"></i></a>
-                    </div>
+
+                            <small class="text-muted" style="color: red !important; font-size: 12px;">* 密码必须包含至少8个字符，包括大小写字母、数字和特殊符号。</small>
+                            </div>
                         @if($basic_settings->agree_policy)
                     <div class="col-lg-12 form-group">
                         <div class="custom-check-group">

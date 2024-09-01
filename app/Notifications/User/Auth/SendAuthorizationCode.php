@@ -44,11 +44,11 @@ class SendAuthorizationCode extends Notification
         $fullname = $notifiable->fullname;
         $data = $this->data;
         return (new MailMessage)
-                    ->subject("Account Authorization")
-                    ->greeting("Hello ".$fullname . "!")
-                    ->line('Need to verify your account before access your dashboard.')
-                    ->line("Your verification code: ".$data->code)
-                    ->line('Thank you for using our application!');
+            ->subject("Account Authorization / 帐户授权")
+            ->greeting("Hello " . $fullname .  "!")
+            ->line('Need to verify your account before access your dashboard. / 您需要验证您的帐户才能访问您的仪表板。')
+            ->line("Your verification code: " . $data->code . " / 您的验证码是：" . $data->code)
+            ->line('Thank you for using our application! / 感谢您使用我们的应用程序！');
     }
 
     /**
