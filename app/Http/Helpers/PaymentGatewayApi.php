@@ -581,7 +581,7 @@ class PaymentGatewayApi {
                 return $response['orderid'] ?? "";
                 break;
             default:
-                throw new Exception("Oops! Gateway not registered in getToken method");
+                throw new Exception("该支付方式未在getToken方法中注册");
         }
         throw new Exception("Gateway token not found!");
     }
