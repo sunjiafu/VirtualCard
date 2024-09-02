@@ -62,7 +62,7 @@ Route::prefix("user")->name("user.")->group(function(){
          //EpUsdt相关路由
          Route::get('epusdt/callback', 'epusdtCallback')->name('epusdt.callback');
          Route::post('epusdt/notify', 'epusdtNotify')->name('epusdt.notify');
-         Route::post('wait','waitPage')->name('wait');
+         Route::get('wait','waitPage')->name('wait');
         //Tatum
         Route::prefix('payment')->name('payment.')->group(function() {
             Route::get('crypto/address/{trx_id}','cryptoPaymentAddress')->name('crypto.address');
