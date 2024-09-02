@@ -1,29 +1,31 @@
 <?php
-// 定义密钥
-$secret_key = 'epusdt_password_virtualcard_api';
-
-// 定义需要签名的参数
-$params = [
-    'amount' =>  '100',
-    'order_id' => uniqid('ORDER_'),
-    'redirect_url' => 'https://velixpay.com/user/add-money',
-    'notify_url' => 'https://velixpay.com/user/add-money/epusdt/notify'
+$parameters = [
+    'order_id' => '202409021725269150735365',
+    'amount' =>'100',
+    'notify_url' => 'https://velixpay.com/user/add-money/epusdt/notify',
+    'redirect_url' => 'https://velixpay.com/user/add-money'
+  
 ];
 
-// 按照字典顺序对参数进行排序
-ksort($params);
+// 第一步：按照字典顺序排序参数
+ksort($parameters);
 
-// 拼接参数为字符串
-$sign_string = '';
-foreach ($params as $key => $value) {
-    $sign_string .= "$key=$value&";
+// 第二步：拼接字符串
+$signString = '';
+foreach ($parameters as $key => $value) {
+    if (!empty($signString)) {
+        $signString .= '&';
+    }
+    $signString .= "$key=$value";
 }
 
-// 去掉最后的&符号
-$sign_string = rtrim($sign_string, '&');
+// 第三步：拼接密钥
+$merchant_key = 'epusdt_password_virtualcard_api';
+$signString .= $merchant_key;
 
-// 生成签名
-$signature = md5($sign_string . $secret_key);
+// 第四步：生成 MD5 签名
+$sign = md5($signString);
 
-echo "签名: " . $signature . "\n" ;
-echo $params['order_id'];
+// 打印用于生成签名的字符串和最终的签名
+echo "Sign String: " . $signString . "\n";
+echo "Generated Sign: " . $sign . "\n";

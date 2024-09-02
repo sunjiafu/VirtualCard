@@ -445,12 +445,17 @@ class AddMoneyController extends Controller
     public function epusdtNotify(Request $request) {
         $callbackData = $request->all();
 
+        // 将回调数据转换为 JSON 格式
+        $callbackJson = json_encode($callbackData, JSON_PRETTY_PRINT);
+    
+        // 定义保存回调数据的文件路径
+        $filePath = storage_path('logs/epusdt_callback_' . date('Y-m-d_H-i-s') . '.txt');
+    
+        // 将回调数据写入文件
+        file_put_contents($filePath, $callbackJson);
+    
         try {
-           
-            return response()->json(['status' => 'success', 'data' => $callbackData]);
-
-
-            //$this->epusdtSuccess($callbackData); // 调用 epusdtSuccess 方法处理回调数据
+            $this->epusdtSuccess($callbackData); // 调用 epusdtSuccess 方法处理回调数据
         } catch (Exception $e) {
             logger($e);
         }

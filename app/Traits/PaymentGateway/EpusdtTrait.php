@@ -13,6 +13,8 @@ use App\Models\UserNotification;
 use App\Models\Admin\BasicSettings;
 use Jenssegers\Agent\Agent;
 use GuzzleHttp\Client;
+use App\Constants\NotificationConst;
+
 
 trait EpusdtTrait
 {
@@ -163,7 +165,6 @@ trait EpusdtTrait
     public function epusdtSuccess($callbackData)
     {
 
-        dd("success");
         $basic_setting = BasicSettings::first();
         $user = auth()->user();
 
