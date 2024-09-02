@@ -1,8 +1,8 @@
 <?php
 $parameters = [
-    'order_id' => '202409021725269150735369',
+    'order_id' => '202409021725269150735310',
     'amount' =>'12',
-    'notify_url' => 'https://velixpay.com/user/add-money/epusdt/notify',
+    'notify_url' => 'https://velixpay.com/payment-callback',
     'redirect_url' => 'https://velixpay.com/user/add-money'
   
 ];
