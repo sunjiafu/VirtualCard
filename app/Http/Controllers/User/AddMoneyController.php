@@ -452,11 +452,11 @@ class AddMoneyController extends Controller
         }
     }
 
-    public function waitPage($order_id){
+    public function waitPage(){
 
         $page_title =__("Payment Processing");
 
-        return view('user.sections.add-money.wait',compact('page_title','order_id'));
+        return view('user.sections.add-money.wait',compact('page_title'));
 
 
     }
