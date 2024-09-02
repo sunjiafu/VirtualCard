@@ -446,6 +446,8 @@ class AddMoneyController extends Controller
         $callbackData = $request->all();
 
         try {
+            logger()->info('EPUSDT Callback Data:', $callbackData);
+
             $this->epusdtSuccess($callbackData); // 调用 epusdtSuccess 方法处理回调数据
         } catch (Exception $e) {
             logger($e);
