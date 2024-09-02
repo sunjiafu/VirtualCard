@@ -19,6 +19,7 @@ use App\Http\Controllers\User\TransferMoneyController;
 use App\Http\Controllers\User\VirtualcardController;
 use App\Http\Controllers\User\WithdrawController;
 
+
 Route::prefix("user")->name("user.")->group(function(){
     Route::controller(DashboardController::class)->group(function(){
         Route::get('dashboard','index')->name('dashboard');

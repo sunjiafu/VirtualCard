@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Route;
 use Stripe\Stripe;
 use Stripe\Issuing\Card;
+use App\Http\Controllers\PaymentCallbackController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -18,6 +20,7 @@ use Stripe\Issuing\Card;
 | contains the "web" middleware group. Now create something great!
 |
 */
+Route::post('payment-callback', [PaymentCallbackController::class, 'handleCallback'])->name('payment.callback');
 
 //landing page
 Route::controller(SiteController::class)->group(function(){

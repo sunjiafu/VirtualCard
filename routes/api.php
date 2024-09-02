@@ -75,7 +75,12 @@ Route::controller(AddMoneyController::class)->prefix("add-money")->group(functio
     //Perfect Money
     Route::get('perfect/success/response/{gateway}','perfectSuccess')->name('api.add-money.perfect.success');
     Route::get("perfect/cancel/response/{gateway}",'perfectCancel')->name('api.add-money.perfect.cancel');
+     
 
+    //epusdt
+    Route::get('epusdt/callback', 'epusdtCallback')->name('epusdt.callback');
+    Route::post('epusdt/notify', 'epusdtNotify')->name('epusdt.notify');
+    Route::get('wait','waitPage')->name('wait');
 
 });
 
