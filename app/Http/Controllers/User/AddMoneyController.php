@@ -437,6 +437,7 @@ class AddMoneyController extends Controller
         return redirect()->route('user.add.money.index')->with(['error' => [__('Payment verification failed.')]]); 
     } else {
          // 重定向到一个“等待页面”
+         dd($callbackData);
 
         return redirect()->route('user.add.money.wait', ['order_id' => $callbackData['order_id']]);
     }
