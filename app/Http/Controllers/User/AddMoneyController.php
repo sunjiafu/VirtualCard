@@ -447,8 +447,8 @@ class AddMoneyController extends Controller
 
         try {
            
-            if($callbackData)
-            dd("success");
+            return response()->json(['status' => 'success', 'data' => $callbackData]);
+
 
             //$this->epusdtSuccess($callbackData); // 调用 epusdtSuccess 方法处理回调数据
         } catch (Exception $e) {
