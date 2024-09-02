@@ -173,7 +173,6 @@ return [
 
     'attributes' => [
 
-        'register password' =>'密码',
     ],
 
 ];

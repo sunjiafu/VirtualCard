@@ -424,6 +424,29 @@ class AddMoneyController extends Controller
             logger($e);
         }
     }
+    //Epusdt CallBack
+    public function epusdtCallback(Request $request) {
+        $callbackData = $request->all();
+
+        try {
+            $this->epusdtSuccess($callbackData); // 调用 epusdtSuccess 方法处理回调数据
+        } catch (Exception $e) {
+            logger($e);
+            return redirect()->route('user.add.money.index')->with(['error' => [__('Something went wrong! Please try again')]]);
+        }
+
+        return redirect()->route("user.add.money.index")->with(['success' => [__('Successfully Added Money')]]);
+    }
+
+    public function epusdtNotify(Request $request) {
+        $callbackData = $request->all();
+
+        try {
+            $this->epusdtSuccess($callbackData); // 调用 epusdtSuccess 方法处理回调数据
+        } catch (Exception $e) {
+            logger($e);
+        }
+    }
     /**
      * Redirect Users for collecting payment via Button Pay (JS Checkout)
      */

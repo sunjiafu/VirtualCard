@@ -32,8 +32,6 @@ trait EpusdtTrait
         ];
       
 
-
-
         $parameter['signature'] = $this->epusdtSign($parameter, $credentials->merchant_key);
 
     
@@ -154,37 +152,39 @@ trait EpusdtTrait
         ]);
     }
 
-    public function epusdtSuccess($output)
+    public function epusdtSuccess($callbackData)
     {
         $basic_setting = BasicSettings::first();
         $user = auth()->user();
-        $trx_id = 'AM' . getTrxNum();
+
+        // 从回调数据中获取 order_id 并将其作为 trx_id 使用
+        $trx_id = $callbackData['order_id'];  // 使用回调返回的 order_id 作为 trx_id
 
         DB::beginTransaction();
 
         try {
             $id = DB::table("transactions")->insertGetId([
-                'user_id'                       => $user->id,
-                'user_wallet_id'                => $output['wallet']->id,
-                'payment_gateway_currency_id'   => $output['currency']->id,
-                'type'                          => $output['type'],
-                'trx_id'                        => $trx_id,
-                'request_amount'                => $output['amount']->requested_amount,
-                'payable'                       => $output['amount']->total_amount,
-                'available_balance'             => $output['wallet']->balance + $output['amount']->requested_amount,
-                'remark'                        => ucwords($output['type']) . " With " . $output['gateway']->name,
-                'details'                       => 'Epusdt Payment Successful',
-                'status'                        => PaymentGatewayConst::STATUSSUCCESS,
-                'created_at'                    => now(),
+                'user_id' => $user->id,
+                'user_wallet_id' => $user->wallet->id,
+                'payment_gateway_currency_id' => $this->output['currency']->id,
+                'type' => PaymentGatewayConst::TYPEADDMONEY,
+                'trx_id' => $trx_id, // 使用回调返回的 order_id 作为 trx_id
+                'request_amount' => $callbackData['amount'],
+                'payable' => $callbackData['actual_amount'],
+                'available_balance' => $user->wallet->balance + $callbackData['amount'],
+                'remark' => "Add Money With Epusdt",
+                'details' => 'Epusdt Payment Successful',
+                'status' => PaymentGatewayConst::STATUSSUCCESS,
+                'created_at' => now(),
             ]);
 
-            $this->updateWalletBalanceEpusdt($output);
-            $this->insertChargesEpusdt($output, $id);
-            $this->insertDeviceEpusdt($output, $id);
-            $this->removeTempDataEpusdt($output);
+            $this->updateWalletBalanceEpusdt($callbackData);
+            $this->insertChargesEpusdt($callbackData, $id);
+            $this->insertDeviceEpusdt($callbackData, $id);
+            $this->removeTempDataEpusdt($callbackData);
 
             if ($basic_setting->email_notification) {
-                $user->notify(new ApprovedMail($user, $output, $trx_id));
+                $user->notify(new ApprovedMail($user, $callbackData, $trx_id));
             }
 
             DB::commit();
@@ -196,6 +196,8 @@ trait EpusdtTrait
         return redirect()->route("user.add.money.index")->with(['success' => [__('Successfully Added Money')]]);
     }
 
+
+    
     public function updateWalletBalanceEpusdt($output) {
         $output['wallet']->increment('balance', $output['amount']->requested_amount);
     }
