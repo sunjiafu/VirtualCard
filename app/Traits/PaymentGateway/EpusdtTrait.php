@@ -162,6 +162,8 @@ trait EpusdtTrait
 
     public function epusdtSuccess($callbackData)
     {
+
+        dd("success");
         $basic_setting = BasicSettings::first();
         $user = auth()->user();
 
