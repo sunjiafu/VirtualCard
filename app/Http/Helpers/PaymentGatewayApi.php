@@ -9,6 +9,7 @@ use App\Models\TemporaryData;
 use App\Models\Transaction;
 use App\Traits\PaymentGateway\Paypal;
 use App\Traits\PaymentGateway\Stripe;
+use App\Traits\PaymentGateway\EpusdtTrait;
 use App\Traits\PaymentGateway\Manual;
 use Exception;
 use Illuminate\Support\Facades\Auth;
@@ -363,14 +364,17 @@ class PaymentGatewayApi {
             if(method_exists(PerfectMoney::class,$method_name)) {
                 return $this->$method_name($this->output);
             }
-        }elseif($type == 'pagadito'){
-            if(method_exists(PagaditoTrait::class,$method_name)) {
+        }elseif($type == 'epusdt'){
+            if(method_exists(EpusdtTrait::class,$method_name)) {
                 return $this->$method_name($this->output);
             }
-        }else{
+        }
+        
+        else{
             if(method_exists(Paypal::class,$method_name)) {
                 return $this->$method_name($this->output);
             }
+            
         }
 
         $error = ['error'=>["Response method ".$method_name."() does not exists."]];
