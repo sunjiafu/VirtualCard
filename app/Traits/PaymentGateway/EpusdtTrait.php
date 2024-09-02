@@ -82,6 +82,13 @@ trait EpusdtTrait
         return $sign;
     }
 
+    public function getSign ($output){
+
+
+        $sign = $this->getEpusdtCredentials($output);
+        return $sign;
+    }
+
     private function getEpusdtCredentials($output)
     {
         $gateway = $output['gateway'] ?? null;

@@ -38,6 +38,8 @@ class AddMoneyController extends Controller
     use Stripe,Manual,FlutterwaveTrait,RazorTrait,SslcommerzTrait,QrpayTrait,EpusdtTrait;
 
     public function index() {
+
+       
         $page_title = __("Add Money");
         $user_wallets = UserWallet::auth()->get();
         $user_currencies = Currency::whereIn('id',$user_wallets->pluck('id')->toArray())->get();
@@ -425,12 +427,11 @@ class AddMoneyController extends Controller
         }
     }
     //Epusdt CallBack
-    public function epusdtCallback(Request $request, $output = null) {
+    public function epusdtCallback(Request $request) {
         $callbackData = $request->all();
-        $signature = $this->getEpusdtCredentials($output);
-
+       
          // 验证回调数据是否有效（此处可根据需要添加验证逻辑）
-    if ($callbackData['signature'] != $signature->merchant_key) {
+    if (!$callbackData) {
         
   // 如果回调验证失败，重定向到错误页面
         return redirect()->route('user.add.money.index')->with(['error' => [__('Payment verification failed.')]]); 
