@@ -577,7 +577,7 @@ class PaymentGatewayApi {
             case PaymentGatewayConst::RAZORPAY:
                 return $response['token'] ?? "";
                 break;
-            case PaymentGatewayConst::EPUSDT;
+            case PaymentGatewayConst::EPUSDT:
                 return $response['orderid'] ?? "";
                 break;
             default:
