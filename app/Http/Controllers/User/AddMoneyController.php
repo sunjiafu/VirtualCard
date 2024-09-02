@@ -428,14 +428,14 @@ class AddMoneyController extends Controller
     public function epusdtCallback(Request $request) {
         $callbackData = $request->all();
 
-        try {
-            $this->epusdtSuccess($callbackData); // 调用 epusdtSuccess 方法处理回调数据
-        } catch (Exception $e) {
-            logger($e);
-            return redirect()->route('user.add.money.index')->with(['error' => [__('Something went wrong! Please try again')]]);
-        }
-
-        return redirect()->route("user.add.money.index")->with(['success' => [__('Successfully Added Money')]]);
+         // 验证回调数据是否有效（此处可根据需要添加验证逻辑）
+    if ($this->isValidCallback($callbackData)) {
+        // 重定向到一个“等待页面”
+        return redirect()->route('user.add.money.wait', ['order_id' => $callbackData['order_id']]);
+    } else {
+        // 如果回调验证失败，重定向到错误页面
+        return redirect()->route('user.add.money.index')->with(['error' => [__('Payment verification failed.')]]);
+    }
     }
 
     public function epusdtNotify(Request $request) {
@@ -446,6 +446,15 @@ class AddMoneyController extends Controller
         } catch (Exception $e) {
             logger($e);
         }
+    }
+
+    public function waitPage($order_id){
+
+        $page_title =__("Payment Processing");
+
+        return view('user.sections.add-money.wait',compact('page_title','order_id'));
+
+
     }
     /**
      * Redirect Users for collecting payment via Button Pay (JS Checkout)

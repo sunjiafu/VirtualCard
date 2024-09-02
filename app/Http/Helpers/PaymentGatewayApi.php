@@ -578,7 +578,7 @@ class PaymentGatewayApi {
                 return $response['token'] ?? "";
                 break;
             case PaymentGatewayConst::EPUSDT:
-                return $response['orderid'] ?? "";
+                return $response['order_id'] ?? "";
                 break;
             default:
                 throw new Exception("该支付方式未在getToken方法中注册");

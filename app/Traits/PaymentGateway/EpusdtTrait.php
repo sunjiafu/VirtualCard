@@ -27,12 +27,11 @@ trait EpusdtTrait
         $parameter = [
             "amount" => (float)$output['amount']->total_amount,
             "order_id" =>  $trx_id,
-            'redirect_url' => route('user.add.money.payment.global.success', ['gateway' => 'epusdt']),
-            'notify_url' => route('user.add.money.epusdt.callback', ['gateway' => 'epusdt']),
+            'redirect_url' => route('user.add.money.epusdt.callback', ['gateway' => 'epusdt']),
+            'notify_url' => route('user.add.money.epusdt.notify', ['gateway' => 'epusdt']),
         ];
       
 
-        dd($parameter);
 
         $parameter['signature'] = $this->epusdtSign($parameter, $credentials->merchant_key);
 
