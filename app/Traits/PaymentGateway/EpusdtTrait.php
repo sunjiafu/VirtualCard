@@ -28,7 +28,7 @@ trait EpusdtTrait
             "amount" => (float)$output['amount']->total_amount,
             "order_id" =>  $trx_id,
             'redirect_url' => route('user.add.money.payment.global.success', ['gateway' => 'epusdt']),
-            'notify_url' => route('user.epusdt.callback', ['gateway' => 'epusdt']),
+            'notify_url' => route('user.add.money.epusdt.callback', ['gateway' => 'epusdt']),
         ];
       
 
