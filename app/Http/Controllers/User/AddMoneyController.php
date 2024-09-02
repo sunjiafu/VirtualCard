@@ -425,16 +425,19 @@ class AddMoneyController extends Controller
         }
     }
     //Epusdt CallBack
-    public function epusdtCallback(Request $request) {
+    public function epusdtCallback(Request $request, $output = null) {
         $callbackData = $request->all();
+        $signature = $this->getEpusdtCredentials($output);
 
          // 验证回调数据是否有效（此处可根据需要添加验证逻辑）
-    if ($this->isValidCallback($callbackData)) {
-        // 重定向到一个“等待页面”
-        return redirect()->route('user.add.money.wait', ['order_id' => $callbackData['order_id']]);
+    if ($callbackData['signature'] != $signature->merchant_key) {
+        
+  // 如果回调验证失败，重定向到错误页面
+        return redirect()->route('user.add.money.index')->with(['error' => [__('Payment verification failed.')]]); 
     } else {
-        // 如果回调验证失败，重定向到错误页面
-        return redirect()->route('user.add.money.index')->with(['error' => [__('Payment verification failed.')]]);
+         // 重定向到一个“等待页面”
+
+        return redirect()->route('user.add.money.wait', ['order_id' => $callbackData['order_id']]);
     }
     }
 
