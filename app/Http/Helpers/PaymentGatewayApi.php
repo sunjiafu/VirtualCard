@@ -577,6 +577,9 @@ class PaymentGatewayApi {
             case PaymentGatewayConst::RAZORPAY:
                 return $response['token'] ?? "";
                 break;
+            case PaymentGatewayConst::EPUSDT;
+                return $response['orderid'] ?? "";
+                break;
             default:
                 throw new Exception("Oops! Gateway not registered in getToken method");
         }
