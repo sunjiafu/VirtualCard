@@ -26,6 +26,8 @@ trait EpusdtTrait
 
         $trx_id = 'AM' . getTrxNum();
 
+        dd($credentials);
+
         $parameter = [
             "amount" => (float)$output['amount']->total_amount,
             "order_id" =>  $trx_id,
