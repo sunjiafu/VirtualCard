@@ -20,6 +20,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Traits\PaymentGateway\Stripe;
 use App\Traits\PaymentGateway\Manual;
+use App\Traits\PaymentGateway\EpusdtTrait; 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use KingFlamez\Rave\Facades\Rave as Flutterwave;
@@ -29,7 +30,7 @@ use Illuminate\Support\Carbon;
 
 class AddMoneyController extends Controller
 {
-    use Stripe,Manual,Tatum;
+    use Stripe,Manual,Tatum,EpusdtTrait;
     public function addMoneyInformation(){
         $user = auth()->user();
         $userWallet = UserWallet::where('user_id',$user->id)->get()->map(function($data){
@@ -680,7 +681,8 @@ class AddMoneyController extends Controller
         $message = ['success' => [__('Successfully Added Money')]];
         return Helpers::onlysuccess($message);
     }
-
+    
+    //Epusdt 异步通知
     public function epusdtNotify(Request $request) {
         $callbackData = $request->all();
 
@@ -693,13 +695,13 @@ class AddMoneyController extends Controller
         // 将回调数据写入文件
         file_put_contents($filePath, $callbackJson);
 
-        return 'ok';
+  
     
-        // try {
-        //     $this->epusdtSuccess($callbackData); // 调用 epusdtSuccess 方法处理回调数据
-        // } catch (Exception $e) {
-        //     logger($e);
-        // }
+        try {
+            $this->epusdtSuccess($callbackData); // 调用 epusdtSuccess 方法处理回调数据
+        } catch (Exception $e) {
+            logger($e);
+        }
     }
     public function coinGateCancel(Request $request, $gateway){
         if($request->has('token')) {
