@@ -453,12 +453,14 @@ class AddMoneyController extends Controller
     
         // 将回调数据写入文件
         file_put_contents($filePath, $callbackJson);
+
+        return 'ok';
     
-        try {
-            $this->epusdtSuccess($callbackData); // 调用 epusdtSuccess 方法处理回调数据
-        } catch (Exception $e) {
-            logger($e);
-        }
+        // try {
+        //     $this->epusdtSuccess($callbackData); // 调用 epusdtSuccess 方法处理回调数据
+        // } catch (Exception $e) {
+        //     logger($e);
+        // }
     }
 
     public function waitPage(){
