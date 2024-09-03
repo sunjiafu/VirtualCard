@@ -1,10 +1,7 @@
 <?php
-$url = route('api.add-money.epusdt.notify');
-
-dd($url);
 
 $parameters = [
-    'order_id' => '2024090217252691507353101',
+    'order_id' => '2024090217252691507353111',
     'amount' =>'12',
     'notify_url' => 'https://velixpay.com/api/add-money/epusdt/notify',
     'redirect_url' => 'https://velixpay.com/user/add-money/equsdt/callback'

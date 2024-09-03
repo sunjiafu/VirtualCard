@@ -60,7 +60,7 @@ Route::controller(AppSettingsController::class)->prefix("app-settings")->group(f
     Route::get('/','appSettings');
     Route::get('languages','languages');
 });
-Route::controller(AddMoneyController::class)->prefix("add-money")->name("add.money")->group(function(){
+Route::controller(AddMoneyController::class)->prefix("add-money")->group(function(){
     Route::get('success/response/paypal/{gateway}','success')->name('api.payment.success');
     Route::get("cancel/response/paypal/{gateway}",'cancel')->name('api.payment.cancel');
     Route::get('stripe/payment/success/{trx}','stripePaymentSuccess')->name('api.stripe.payment.success');
