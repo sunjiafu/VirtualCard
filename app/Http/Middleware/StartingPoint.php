@@ -40,7 +40,7 @@ class StartingPoint
 
         // if(Config::get('starting-point.status') === true) {
         //     return redirect(Config::get('starting-point.point'));
-        // }
+        // }  
         return $next($request);
     }
 }
