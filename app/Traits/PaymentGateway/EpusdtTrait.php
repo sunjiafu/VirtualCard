@@ -31,7 +31,7 @@ trait EpusdtTrait
             "amount" => (float)$output['amount']->total_amount,
             "order_id" =>  $trx_id,
             'redirect_url' => route('user.add.money.epusdt.callback', ['gateway' => 'epusdt']),
-            'notify_url' => route('api.add-money.epusdt.notify'),
+            'notify_url' => route('api.add.money.epusdt.notify'),
         ];
       
 
