@@ -23,7 +23,6 @@ trait EpusdtTrait
         if (!$output) $output = $this->output;
 
         $credentials = $this->getEpusdtCredentials($output);
-        $payment_url = 'http://127.0.0.1:8000/api/v1/order/create-transaction';
 
         $trx_id = 'AM' . getTrxNum();
 
@@ -43,7 +42,7 @@ trait EpusdtTrait
 
         try {
             $client = new Client(['headers' => ['Content-Type' => 'application/json']]);
-            $response = $client->post($payment_url, ['body' => json_encode($parameter)]);
+            $response = $client->post($credentials->payment_url, ['body' => json_encode($parameter)]);
             $body = json_decode($response->getBody()->getContents(), true);
 
             if (!isset($body['status_code']) || $body['status_code'] != 200) {

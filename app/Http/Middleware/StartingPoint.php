@@ -38,9 +38,9 @@ class StartingPoint
             Config::set('starting-point.point','/project/install/welcome');
         }
 
-        if(Config::get('starting-point.status') === true) {
-            return redirect(Config::get('starting-point.point'));
-        }
+        // if(Config::get('starting-point.status') === true) {
+        //     return redirect(Config::get('starting-point.point'));
+        // }
         return $next($request);
     }
 }
