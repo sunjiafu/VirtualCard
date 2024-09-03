@@ -79,7 +79,7 @@ Route::controller(AddMoneyController::class)->prefix("add-money")->group(functio
 
     //epusdt
     Route::get('epusdt/callback', 'epusdtCallback')->name('epusdt.callback');
-    Route::post('epusdt/notify', 'epusdtNotify')->name('epusdt.notify');
+    Route::post('epusdt/notify', 'epusdtNotify')->name('api.add-money.epusdt.notify');
     Route::get('wait','waitPage')->name('wait');
 
 });
