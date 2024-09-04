@@ -18,29 +18,30 @@ use App\Constants\NotificationConst;
 
 trait EpusdtTrait
 {
+    // 初始化支付流程，生成支付请求并重定向到支付网关
     public function epusdtInit($output = null)
     {
         if (!$output) $output = $this->output;
 
+        // 获取支付凭证
         $credentials = $this->getEpusdtCredentials($output);
 
+        // 生成交易ID
         $trx_id = 'AM' . getTrxNum();
 
-
+        // 构建请求参数
         $parameter = [
             "amount" => (float)$output['amount']->total_amount,
             "order_id" =>  $trx_id,
-            'redirect_url' => route('user.add.money.epusdt.callback', ['gateway' => 'epusdt']),
-            'notify_url' => route('api.add-money.epusdt.notify'),
+            'redirect_url' => route('user.add.money.epusdt.success', ['gateway' => 'epusdt']),
+            'notify_url' => route('user.add.money.epusdt.notify'),  // 异步回调URL
         ];
-      
 
-
+        // 生成签名
         $parameter['signature'] = $this->epusdtSign($parameter, $credentials->merchant_key);
 
-    
-
         try {
+            // 发送支付请求
             $client = new Client(['headers' => ['Content-Type' => 'application/json']]);
             $response = $client->post($credentials->payment_url, ['body' => json_encode($parameter)]);
             $body = json_decode($response->getBody()->getContents(), true);
@@ -49,154 +50,119 @@ trait EpusdtTrait
                 throw new Exception(__('Payment channel error: ') . $body['message']);
             }
 
+            // 存储临时支付数据
             $this->epusdtJunkInsert($parameter);
 
+            // 跳转到支付链接
             return redirect()->away($body['data']['payment_url']);
-        } catch (GuzzleException $e) {
+        } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }
     }
 
+    // 生成签名的方法，确保请求数据的安全性
     private function epusdtSign(array $parameter, string $signKey)
     {
         ksort($parameter);
-        reset($parameter); //内部指针指向数组中的第一个元素
         $sign = '';
-        $urls = '';
         foreach ($parameter as $key => $val) {
-            if ($val == '') continue;
-            if ($key != 'signature') {
-                if ($sign != '') {
-                    $sign .= "&";
-                    $urls .= "&";
-                }
-                $sign .= "$key=$val"; //拼接为url参数形式
-                $urls .= "$key=" . urlencode($val); //拼接为url参数形式
+            if ($val != '' && $key != 'signature') {
+                $sign .= "$key=$val&";
             }
         }
-        echo "Sign String: " . $sign . "<br>";
-
-
-        $sign = md5($sign . $signKey);//密码追加进入开始MD5签名
-
-        echo "Generated Sign: " . $sign . "<br>";
-
-
-        return $sign;
+        return md5(rtrim($sign, '&') . $signKey);
     }
 
-    public function getSign ($output){
-
-
-        $sign = $this->getEpusdtCredentials($output);
-        return $sign;
-    }
-
+    // 获取支付网关凭证的方法
     private function getEpusdtCredentials($output)
     {
         $gateway = $output['gateway'] ?? null;
         if(!$gateway) throw new Exception(__("Payment gateway not available"));
-        $client_id_sample = ['payment_url','payment url','payment-url'];
-        $client_secret_sample = ['merchant key','merchant-key','merchant_key'];
 
-        $client_id = '';
-        $outer_break = false;
-        foreach($client_id_sample as $item) {
-            if($outer_break == true) {
-                break;
-            }
-            $modify_item = $this->stripePlainText($item);
-            foreach($gateway->credentials ?? [] as $gatewayInput) {
-                $label = $gatewayInput->label ?? "";
-                $label = $this->stripePlainText($label);
-
-                if($label == $modify_item) {
-                    $client_id = $gatewayInput->value ?? "";
-                    $outer_break = true;
-                    break;
-                }
-            }
-        }
-
-
-        $secret_id = '';
-        $outer_break = false;
-        foreach($client_secret_sample as $item) {
-            if($outer_break == true) {
-                break;
-            }
-            $modify_item = $this->stripePlainText($item);
-            foreach($gateway->credentials ?? [] as $gatewayInput) {
-                $label = $gatewayInput->label ?? "";
-                $label = $this->stripePlainText($label);
-
-                if($label == $modify_item) {
-                    $secret_id = $gatewayInput->value ?? "";
-                    $outer_break = true;
-                    break;
-                }
-            }
-        }
+        // 获取支付网关的支付URL和商户密钥
+        $payment_url = $this->getGatewayCredentialValue($gateway, ['payment_url', 'payment-url']);
+        $merchant_key = $this->getGatewayCredentialValue($gateway, ['merchant_key', 'merchant-key', 'merchant key']);
 
         return (object) [
-            'payment_url'     => $client_id,
-            'merchant_key' => $secret_id,
-
+            'payment_url'     => $payment_url,
+            'merchant_key'    => $merchant_key,
         ];
-
     }
 
-    private function epusdtJunkInsert($parameter)
+    // 辅助函数，用于从网关凭证中获取值
+    private function getGatewayCredentialValue($gateway, $keys)
     {
+        foreach ($keys as $key) {
+            foreach ($gateway->credentials ?? [] as $credential) {
+                if (strtolower(str_replace(' ', '_', $credential->label)) == strtolower($key)) {
+                    return $credential->value;
+                }
+            }
+        }
+        return null;
+    }
+
+    // 存储支付数据到临时表中
+    public function epusdtJunkInsert($response) {
+        $output = $this->output;
+        $user = auth()->guard(get_auth_guard())->user();
         $data = [
-            'gateway' => $this->output['gateway']->id,
-            'currency' => $this->output['currency']->id,
-            'amount' => $this->output['amount'],
-            'response' => $parameter,
+            'gateway'      => $output['gateway']->id,  // 支付网关ID
+            'currency'     => $output['currency']->id, // 货币ID
+            'amount'       => json_decode(json_encode($output['amount']), true),  // 金额信息
+            'response'     => $response,  // 支付响应数据
+            'wallet_table' => $output['wallet']->getTable(), // 钱包表名
+            'wallet_id'    => $output['wallet']->id,  // 钱包ID
+            'creator_table'=> $user->getTable(),  // 用户表名
+            'creator_id'   => $user->id,  // 用户ID
+            'creator_guard'=> get_auth_guard(),  // 用户认证守卫
         ];
 
-        Session::put('identifier', $parameter['order_id']);
-        TemporaryData::create([
-            'type' => PaymentGatewayConst::EPUSDT,
-            'identifier' => $parameter['order_id'],
-            'data' => $data,
+        Session::put('identifier', $response['order_id']);
+        Session::put('output', $output);
+
+        // 插入数据到 TemporaryData 表中
+        return TemporaryData::create([
+            'type'          => PaymentGatewayConst::EPUSDT,  // 标记为EPUSDT支付类型
+            'identifier'    => $response['order_id'],  // 使用订单号作为唯一标识符
+            'data'          => $data,  // 存储的数据
         ]);
     }
 
-    public function epusdtSuccess($callbackData)
+    // 支付成功后的处理逻辑
+    public function epusdtSuccess($output)
     {
-
         $basic_setting = BasicSettings::first();
         $user = auth()->user();
-
-        // 从回调数据中获取 order_id 并将其作为 trx_id 使用
-        $trx_id = $callbackData['order_id'];  // 使用回调返回的 order_id 作为 trx_id
+        $trx_id = $output['tempData']['identifier'];  // 使用回调返回的 order_id 作为 trx_id
 
         DB::beginTransaction();
 
         try {
+            // 插入交易记录
             $id = DB::table("transactions")->insertGetId([
                 'user_id' => $user->id,
                 'user_wallet_id' => $user->wallet->id,
-                'payment_gateway_currency_id' => $this->output['currency']->id,
+                'payment_gateway_currency_id' => $output['currency']->id,
                 'type' => PaymentGatewayConst::TYPEADDMONEY,
-                'trx_id' => $trx_id, // 使用回调返回的 order_id 作为 trx_id
-                'request_amount' => $callbackData['amount'],
-                'payable' => $callbackData['actual_amount'],
-                'available_balance' => $user->wallet->balance + $callbackData['amount'],
-                'remark' => "Add Money With Epusdt",
-                'details' => 'Epusdt Payment Successful',
+                'trx_id' => $trx_id,  // 使用订单号作为交易ID
+                'request_amount' => $output['tempData']['data']['amount'],
+                'payable' => $output['tempData']['data']['actual_amount'],
+                'available_balance' => $user->wallet->balance + $output['tempData']['data']['amount'],
+                'remark' => "Add Money With EPUSDT",
+                'details' => 'EPUSDT Payment Successful',
                 'status' => PaymentGatewayConst::STATUSSUCCESS,
                 'created_at' => now(),
             ]);
 
-            $this->updateWalletBalanceEpusdt($callbackData);
-            $this->insertChargesEpusdt($callbackData, $id);
-            $this->insertDeviceEpusdt($callbackData, $id);
-            $this->removeTempDataEpusdt($callbackData);
+            $this->updateWalletBalanceEpusdt($output);  // 更新用户钱包余额
+            $this->insertChargesEpusdt($output, $id);  // 插入交易手续费记录
+            $this->insertDeviceEpusdt($output, $id);  // 记录交易设备信息
+            $this->removeTempDataEpusdt($output);  // 删除临时数据
 
+            // 发送邮件通知
             if ($basic_setting->email_notification) {
-                $user->notify(new ApprovedMail($user, $callbackData, $trx_id));
+                $user->notify(new ApprovedMail($user, $output, $trx_id));
             }
 
             DB::commit();
@@ -208,12 +174,12 @@ trait EpusdtTrait
         return redirect()->route("user.add.money.index")->with(['success' => [__('Successfully Added Money')]]);
     }
 
-
-    
+    // 更新钱包余额
     public function updateWalletBalanceEpusdt($output) {
         $output['wallet']->increment('balance', $output['amount']->requested_amount);
     }
 
+    // 插入手续费记录
     public function insertChargesEpusdt($output, $id) {
         DB::table('transaction_charges')->insert([
             'transaction_id'    => $id,
@@ -227,7 +193,6 @@ trait EpusdtTrait
             'title'         => "Add Money",
             'message'       => "Your Wallet" . " (" . $output['wallet']->currency->code . ")  " . "balance  has been added" . " " . $output['amount']->requested_amount . ' ' . $output['wallet']->currency->code,
             'time'          => Carbon::now()->diffForHumans(),
-            'image'         => get_image(auth()->user()->image, 'user-profile'),
         ];
 
         UserNotification::create([
@@ -237,17 +202,15 @@ trait EpusdtTrait
         ]);
     }
 
+    // 插入设备信息
     public function insertDeviceEpusdt($output, $id) {
         $client_ip = request()->ip() ?? false;
         $location = geoip()->getLocation($client_ip);
         $agent = new Agent();
 
-        $mac = "";
-
         DB::table("transaction_devices")->insert([
             'transaction_id'=> $id,
             'ip'            => $client_ip,
-            'mac'           => $mac,
             'city'          => $location['city'] ?? "",
             'country'       => $location['country'] ?? "",
             'longitude'     => $location['lon'] ?? "",
@@ -258,6 +221,7 @@ trait EpusdtTrait
         ]);
     }
 
+    // 删除临时数据
     public function removeTempDataEpusdt($output) {
         TemporaryData::where("identifier", $output['tempData']['identifier'])->delete();
     }

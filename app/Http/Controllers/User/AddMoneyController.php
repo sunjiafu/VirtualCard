@@ -426,6 +426,39 @@ class AddMoneyController extends Controller
             logger($e);
         }
     }
+
+    public function epusdtSuccess(Request $request)
+{
+    // 获取用户支付的token
+    $token = $request->get('order_id');
+    
+    // 查询临时数据存储的交易信息
+    $checkTempData = TemporaryData::where('type', PaymentGatewayConst::EPUSDT)
+                                  ->where('identifier', $token)
+                                  ->first();
+
+    // 检查是否存在此交易记录
+    if (!$checkTempData) {
+        return redirect()->route('user.add.money.index')
+                         ->with(['error' => [__('Transaction failed. Record didn\'t saved properly. Please try again')]]);
+    }
+
+    $checkTempData = $checkTempData->toArray();
+
+    // 开始处理支付成功的逻辑
+    try {
+        PaymentGatewayHelper::init($checkTempData)
+                            ->type(PaymentGatewayConst::TYPEADDMONEY)
+                            ->responseReceive('epusdt');
+    } catch (Exception $e) {
+        return back()->with(['error' => [__('Something went wrong! Please try again')]]);
+    }
+
+    // 支付成功后重定向到用户的资金页面并提示成功
+    return redirect()->route('user.add.money.index')
+                     ->with(['success' => [__('Successfully Added Money')]]);
+}
+
     //Epusdt CallBack
     public function epusdtCallback(Request $request) {
         $callbackData = $request->all();
@@ -442,26 +475,53 @@ class AddMoneyController extends Controller
     }
     }
 
-    public function epusdtNotify(Request $request) {
-        $callbackData = $request->all();
+    public function epusdtNotify(Request $request)
+{
+    // 获取回调的所有数据
+    $callbackData = $request->all();
 
-        // 将回调数据转换为 JSON 格式
-        $callbackJson = json_encode($callbackData, JSON_PRETTY_PRINT);
-    
-        // 定义保存回调数据的文件路径
-        $filePath = storage_path('logs/epusdt_callback_' . date('Y-m-d_H-i-s') . '.txt');
-    
-        // 将回调数据写入文件
-        file_put_contents($filePath, $callbackJson);
-
-        return 'ok';
-    
-        try {
-            $this->epusdtSuccess($callbackData); // 调用 epusdtSuccess 方法处理回调数据
-        } catch (Exception $e) {
-            logger($e);
-        }
+    // 验证回调数据是否有效
+    if (empty($callbackData['order_id'])) {
+        return response()->json(['error' => __('Invalid callback data')], 400);
     }
+
+    // 根据回调中的 order_id 获取临时数据
+    $tempData = TemporaryData::where('identifier', $callbackData['order_id'])->first();
+
+    // 检查是否存在相关交易记录
+    if (!$tempData) {
+        return response()->json(['error' => __('Transaction not found')], 404);
+    }
+
+    // 开始处理支付成功的逻辑
+    try {
+        // 调用支付成功处理函数
+        $this->epusdtSuccess($tempData->data);
+    } catch (Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 500);
+    }
+
+    // 返回处理成功的响应
+    return response()->json(['success' => true], 200);
+}
+
+
+public function epusdtCancel(Request $request)
+{
+    // 获取支付取消的token
+    $token = $request->get('order_id');
+
+    // 删除临时数据
+    if ($token) {
+        TemporaryData::where('identifier', $token)->delete();
+    }
+
+    // 重定向回到用户的资金页面并显示取消信息
+    return redirect()->route('user.add.money.index')
+                     ->with(['error' => [__('Payment Cancelled')]]);
+}
+
+
 
     public function waitPage(){
 

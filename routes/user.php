@@ -61,10 +61,10 @@ Route::prefix("user")->name("user.")->group(function(){
          Route::match(['get','post'],"coingate/cancel/response/{gateway}",'coinGateCancel')->name('coingate.payment.cancel');
 
          //EpUsdt相关路由
-         Route::get('epusdt/callback', 'epusdtCallback')->name('epusdt.callback');
-         Route::post('epusdt/notify', 'epusdtNotify')->name('epusdt.notify');
-         Route::get('wait','waitPage')->name('wait');
-        //Tatum
+         Route::get('epusdt/success', 'epusdtSuccess')->name('epusdt.success');
+         Route::post('epusdt/notify', 'epusdtNotify')->name('epusdt.notify')->withoutMiddleware(['web', 'auth', 'verification.guard', 'user.google.two.factor']);
+         Route::get('epusdt/cancel', 'epusdtCancel')->name('epusdt.cancel');
+         //Tatum
         Route::prefix('payment')->name('payment.')->group(function() {
             Route::get('crypto/address/{trx_id}','cryptoPaymentAddress')->name('crypto.address');
             Route::post('crypto/confirm/{trx_id}','cryptoPaymentConfirm')->name('crypto.confirm');

@@ -682,7 +682,7 @@ class AddMoneyController extends Controller
         return Helpers::onlysuccess($message);
     }
     
-    //Epusdt 异步通知
+    //Epusdt 
     public function epusdtNotify(Request $request) {
         $callbackData = $request->all();
 
@@ -695,14 +695,55 @@ class AddMoneyController extends Controller
         // 将回调数据写入文件
         file_put_contents($filePath, $callbackJson);
 
-  
-    
-        try {
-            $this->epusdtSuccess($callbackData); // 调用 epusdtSuccess 方法处理回调数据
-        } catch (Exception $e) {
-            logger($e);
+        
+            // // 获取商户密钥
+            // $credentials = $this->getEpusdtCredentials($callbackData);
+            
+            // // 验证回调签名
+            // if (!$this->validateEpusdtCallback($callbackData, $credentials->merchant_key)) {
+            //     return response()->json(['error' => 'Invalid signature'], 400);
+            // }
+        
+            // // 验证回调数据的其他字段（如状态）
+            // if ($callbackData['status'] !== 'success') {
+            //     return response()->json(['error' => 'Payment failed'], 400);
+            // }
+        
+            // 查找交易记录
+            $tempData = TemporaryData::where("identifier", $callbackData['order_id'])->first();
+            if (!$tempData) {
+                return response()->json(['error' => 'Transaction not found'], 404);
+            }
+        
+            // 从 TemporaryData 中恢复用户信息
+            $user_id = $tempData->data['creator_id'];
+            $user = DB::table('users')->where('id', $user_id)->first();
+        
+            if (!$user) {
+                return response()->json(['error' => 'User not found'], 404);
+            }
+        
+            // 将用户信息和回调数据一起传递给 epusdtSuccess 方法
+            $output = [
+                'user' => $user,
+                'tempData' => json_decode(json_encode($tempData->data), true),
+                'currency' => $tempData->data['currency'],
+                'amount' => $tempData->data['amount']
+            ];
+        
+            try {
+                $this->epusdtSuccess($output); // 调用 epusdtSuccess 方法处理回调数据
+            } catch (Exception $e) {
+                logger($e);
+                return response()->json(['error' => 'Failed to process payment'], 500);
+            }
+        
+            return response()->json(['success' => 'Payment processed successfully'], 200);
         }
-    }
+        
+    
+       
+    
     public function coinGateCancel(Request $request, $gateway){
         if($request->has('token')) {
             $identifier = $request->token;
