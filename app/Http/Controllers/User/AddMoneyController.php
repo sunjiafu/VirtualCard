@@ -493,10 +493,13 @@ class AddMoneyController extends Controller
         return response()->json(['error' => __('Transaction not found')], 404);
     }
 
+    $dataArray = json_decode(json_encode($tempData->data), true);
+
+
     // 开始处理支付成功的逻辑
     try {
         // 调用支付成功处理函数
-        $this->epusdtSuccess($tempData->data);
+        $this->epusdtSuccess($dataArray);
     } catch (Exception $e) {
         return response()->json(['error' => $e->getMessage()], 500);
     }

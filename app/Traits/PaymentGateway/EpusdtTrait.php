@@ -131,7 +131,10 @@ trait EpusdtTrait
 
     // 支付成功后的处理逻辑
     public function epusdtSuccess($output)
+    
     {
+
+
         $basic_setting = BasicSettings::first();
         $user = auth()->user();
         $trx_id = $output['tempData']['identifier'];  // 使用回调返回的 order_id 作为 trx_id
