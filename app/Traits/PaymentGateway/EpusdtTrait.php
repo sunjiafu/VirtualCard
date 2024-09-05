@@ -5,6 +5,7 @@ namespace App\Traits\PaymentGateway;
 use Exception;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\TemporaryData;
 use App\Constants\PaymentGatewayConst;
@@ -14,7 +15,8 @@ use App\Models\Admin\BasicSettings;
 use Jenssegers\Agent\Agent;
 use GuzzleHttp\Client;
 use App\Constants\NotificationConst;
-
+use App\Models\User;
+use App\Models\UserWallet;
 
 trait EpusdtTrait
 {
@@ -106,6 +108,7 @@ trait EpusdtTrait
     public function epusdtJunkInsert($response) {
         $output = $this->output;
         $user = auth()->guard(get_auth_guard())->user();
+        $creator_table = auth()->guard(get_auth_guard())->user()->getTable();
         $data = [
             'gateway'      => $output['gateway']->id,  // 支付网关ID
             'currency'     => $output['currency']->id, // 货币ID
@@ -134,28 +137,51 @@ trait EpusdtTrait
     
     {
 
+         
 
+        
+
+       
         $basic_setting = BasicSettings::first();
-        $user = auth()->user();
-        $trx_id = $output['tempData']['identifier'];  // 使用回调返回的 order_id 作为 trx_id
+
+        $trx_id = $output['identifier'];  // 使用回调返回的 order_id 作为 trx_id
+        $creator_id = $output['data']->creator_id ?? null;
+        $user_wallet_id =$output['data']->wallet_id ?? null;
+        $currency_id = $output['data']->currency ?? null;
+        $request_amount = $output['data']->amount->requested_amount ?? null;
+        $user_wallet =UserWallet::where('id',$user_wallet_id)->first();//获取用户钱包
+        $available_balance =$user_wallet->balance + $request_amount;
+        $payable  = $output['data']->amount->total_amount;
+        $remark   = ucwords(remove_speacial_char($output['type']," "));
+
+
+       
+
+        
 
         DB::beginTransaction();
 
         try {
+
+            if(Auth::guard(get_auth_guard())->check()){
+                $user_id = auth()->guard(get_auth_guard())->user()->id;
+            }
+
+            
             // 插入交易记录
             $id = DB::table("transactions")->insertGetId([
-                'user_id' => $user->id,
-                'user_wallet_id' => $user->wallet->id,
-                'payment_gateway_currency_id' => $output['currency']->id,
-                'type' => PaymentGatewayConst::TYPEADDMONEY,
-                'trx_id' => $trx_id,  // 使用订单号作为交易ID
-                'request_amount' => $output['tempData']['data']['amount'],
-                'payable' => $output['tempData']['data']['actual_amount'],
-                'available_balance' => $user->wallet->balance + $output['tempData']['data']['amount'],
-                'remark' => "Add Money With EPUSDT",
-                'details' => 'EPUSDT Payment Successful',
-                'status' => PaymentGatewayConst::STATUSSUCCESS,
-                'created_at' => now(),
+                'user_id'                       => $creator_id,
+                'user_wallet_id'                => $user_wallet_id,
+                'payment_gateway_currency_id'   => $currency_id,
+                'type'                          => "ADD-MONEY",
+                'trx_id'                        => $trx_id,
+                'request_amount'                => $request_amount,
+                'payable'                       => $payable,
+                'available_balance'             => $available_balance,
+                'remark'                        => $remark,
+                'details'                       => 'Flutter Wave Payment Successfull',
+                'status'                        => true,
+                'created_at'                    => now(),
             ]);
 
             $this->updateWalletBalanceEpusdt($output);  // 更新用户钱包余额
@@ -164,9 +190,9 @@ trait EpusdtTrait
             $this->removeTempDataEpusdt($output);  // 删除临时数据
 
             // 发送邮件通知
-            if ($basic_setting->email_notification) {
-                $user->notify(new ApprovedMail($user, $output, $trx_id));
-            }
+            // if ($basic_setting->email_notification) {
+            //     $user->notify(new ApprovedMail($user, $output, $trx_id));
+            // }
 
             DB::commit();
         } catch (Exception $e) {
@@ -179,30 +205,38 @@ trait EpusdtTrait
 
     // 更新钱包余额
     public function updateWalletBalanceEpusdt($output) {
-        $output['wallet']->increment('balance', $output['amount']->requested_amount);
+
+        $user_wallet =UserWallet::where('id',$output['data']->wallet_id)->first();//获取用户钱包
+
+        
+        $user_wallet->increment('balance', $output['data']->amount->requested_amount);
+
     }
 
     // 插入手续费记录
     public function insertChargesEpusdt($output, $id) {
+
         DB::table('transaction_charges')->insert([
             'transaction_id'    => $id,
-            'percent_charge'    => $output['amount']->percent_charge,
-            'fixed_charge'      => $output['amount']->fixed_charge,
-            'total_charge'      => $output['amount']->total_charge,
+            'percent_charge'    => $output['data']->amount->percent_charge,
+            'fixed_charge'      => $output['data']->amount->fixed_charge,
+            'total_charge'      => $output['data']->amount->total_charge,
             'created_at'        => now(),
         ]);
 
         $notification_content = [
             'title'         => "Add Money",
-            'message'       => "Your Wallet" . " (" . $output['wallet']->currency->code . ")  " . "balance  has been added" . " " . $output['amount']->requested_amount . ' ' . $output['wallet']->currency->code,
+            'message'       => "Your Wallet"  . "balance  has been added"  .  $output['data']->amount->requested_amount,
             'time'          => Carbon::now()->diffForHumans(),
         ];
 
         UserNotification::create([
             'type'      => NotificationConst::BALANCE_ADDED,
-            'user_id'   => auth()->user()->id,
+            'user_id'   => $output['data']->creator_id,
             'message'   => $notification_content,
         ]);
+
+     
     }
 
     // 插入设备信息
@@ -226,6 +260,6 @@ trait EpusdtTrait
 
     // 删除临时数据
     public function removeTempDataEpusdt($output) {
-        TemporaryData::where("identifier", $output['tempData']['identifier'])->delete();
+        TemporaryData::where("identifier", $output['identifier'])->delete();
     }
 }

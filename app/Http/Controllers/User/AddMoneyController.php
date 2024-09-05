@@ -222,7 +222,7 @@ class AddMoneyController extends Controller
     public function coinGateSuccess(Request $request, $gateway){
 
         try{
-            $token = $request->token;
+            $token = $request->get('order_id');
             $checkTempData = TemporaryData::where("type",PaymentGatewayConst::COINGATE)->where("identifier",$token)->first();
             if(!$checkTempData) return redirect()->route('user.add.money.index')->with(['error' => [__('Transaction failed. Record didn\'t saved properly. Please try again')]]);
 
@@ -427,79 +427,82 @@ class AddMoneyController extends Controller
         }
     }
 
-    public function epusdtSuccess(Request $request)
-{
-    // 获取用户支付的token
-    $token = $request->get('order_id');
+//     public function epusdtSuccess(Request $request)
+// {
+//     // 获取用户支付的token
+//     $token = $request->get('order_id');
     
-    // 查询临时数据存储的交易信息
-    $checkTempData = TemporaryData::where('type', PaymentGatewayConst::EPUSDT)
-                                  ->where('identifier', $token)
-                                  ->first();
+//     // 查询临时数据存储的交易信息
+//     $checkTempData = TemporaryData::where('type', PaymentGatewayConst::EPUSDT)
+//                                   ->where('identifier', $token)
+//                                   ->first();
 
-    // 检查是否存在此交易记录
-    if (!$checkTempData) {
-        return redirect()->route('user.add.money.index')
-                         ->with(['error' => [__('Transaction failed. Record didn\'t saved properly. Please try again')]]);
-    }
+//     // 检查是否存在此交易记录
+//     if (!$checkTempData) {
+//         return redirect()->route('user.add.money.index')
+//                          ->with(['error' => [__('Transaction failed. Record didn\'t saved properly. Please try again')]]);
+//     }
 
-    $checkTempData = $checkTempData->toArray();
+//     $checkTempData = $checkTempData->toArray();
 
-    // 开始处理支付成功的逻辑
-    try {
-        PaymentGatewayHelper::init($checkTempData)
-                            ->type(PaymentGatewayConst::TYPEADDMONEY)
-                            ->responseReceive('epusdt');
-    } catch (Exception $e) {
-        return back()->with(['error' => [__('Something went wrong! Please try again')]]);
-    }
+//     // 开始处理支付成功的逻辑
+//     try {
+//         PaymentGatewayHelper::init($checkTempData)
+//                             ->type(PaymentGatewayConst::TYPEADDMONEY)
+//                             ->responseReceive('epusdt');
+//     } catch (Exception $e) {
+//         return back()->with(['error' => [__('Something went wrong! Please try again')]]);
+//     }
 
-    // 支付成功后重定向到用户的资金页面并提示成功
-    return redirect()->route('user.add.money.index')
-                     ->with(['success' => [__('Successfully Added Money')]]);
-}
+//     // 支付成功后重定向到用户的资金页面并提示成功
+//     return redirect()->route('user.add.money.index')
+//                      ->with(['success' => [__('Successfully Added Money')]]);
+// }
 
-    //Epusdt CallBack
-    public function epusdtCallback(Request $request) {
-        $callbackData = $request->all();
+//     //Epusdt CallBack
+//     public function epusdtCallback(Request $request) {
+//         $callbackData = $request->all();
        
-         // 验证回调数据是否有效（此处可根据需要添加验证逻辑）
-    if (!$callbackData) {
+//          // 验证回调数据是否有效（此处可根据需要添加验证逻辑）
+//     if (!$callbackData) {
         
-  // 如果回调验证失败，重定向到错误页面
-        return redirect()->route('user.add.money.index')->with(['error' => [__('Payment verification failed.')]]); 
-    } else {
-         // 重定向到一个“等待页面”
-      
-        return redirect()->route('user.add.money.wait');
-    }
-    }
+//   // 如果回调验证失败，重定向到错误页面
+//         return redirect()->route('user.add.money.index')->with(['error' => [__('Payment verification failed.')]]); 
+//     } else {
+//          // 重定向到一个“等待页面”
+//     }
 
     public function epusdtNotify(Request $request)
 {
     // 获取回调的所有数据
     $callbackData = $request->all();
+    $token =$callbackData['order_id'];
 
     // 验证回调数据是否有效
-    if (empty($callbackData['order_id'])) {
+    if (empty($token)) {
         return response()->json(['error' => __('Invalid callback data')], 400);
     }
 
     // 根据回调中的 order_id 获取临时数据
     $tempData = TemporaryData::where('identifier', $callbackData['order_id'])->first();
 
+    $tempData = $tempData->toArray();
+    $creator_id = $tempData['data']->creator_id ?? null;
+    $creator_guard = $tempData['data']->creator_guard ?? null;
+
+
     // 检查是否存在相关交易记录
     if (!$tempData) {
         return response()->json(['error' => __('Transaction not found')], 404);
     }
 
-    $dataArray = json_decode(json_encode($tempData->data), true);
 
 
     // 开始处理支付成功的逻辑
     try {
+
         // 调用支付成功处理函数
-        $this->epusdtSuccess($dataArray);
+        $this->epusdtSuccess($tempData);
     } catch (Exception $e) {
         return response()->json(['error' => $e->getMessage()], 500);
     }

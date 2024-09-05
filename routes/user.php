@@ -57,7 +57,7 @@ Route::prefix("user")->name("user.")->group(function(){
         Route::get('qrpay/success', 'qrPaySuccess')->name('qrpay.success');
         Route::get('qrpay/cancel/{trx}', 'qrPayCancel')->name('qrpay.cancel');
          //coingate
-         Route::match(['get','post'],'coingate/success/response/{gateway}','coinGateSuccess')->name('coingate.payment.success');
+         Route::match(['get','post'],'coingate/success/response/{gateway}','coinGateSuccess')->name('coingate.payment.success')->withoutMiddleware(['auth','web','verification.guard']);
          Route::match(['get','post'],"coingate/cancel/response/{gateway}",'coinGateCancel')->name('coingate.payment.cancel');
 
          //EpUsdt相关路由

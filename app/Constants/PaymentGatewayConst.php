@@ -118,7 +118,8 @@ class PaymentGatewayConst {
             'isTatum'           => self::TATUM,
             'isPerfectMoney'    => self::PERFECT_MONEY,
             'isRazorpay'        => self::RAZORPAY,
-            'isPagadito'        => self::PAGADITO
+            'isPagadito'        => self::PAGADITO,
+            'isEpusdt'          => self::EPUSDT  
         ];
     }
 

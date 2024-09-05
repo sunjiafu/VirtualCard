@@ -338,6 +338,11 @@ class PaymentGateway {
             if(method_exists(PagaditoTrait::class,$method_name)) {
                 return $this->$method_name($this->output);
             }
+        }elseif($type == 'epusdt'){
+
+            if(method_exists(EpusdtTrait::class,$method_name)) {
+                return $this->$method_name($this->output);
+            }
         }else{
             if(method_exists(Paypal::class,$method_name)) {
                 return $this->$method_name($this->output);
