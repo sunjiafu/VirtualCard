@@ -57,19 +57,11 @@
                         <i class="lab la-telegram"></i>
                     </div>
                     <div class="contact-containt">
-                        <h4 class="title">{{ __("Mobile Number") }}</h4>
+                        <h4 class="title">{{ __("Teregram") }}</h4>
                         {{ __(@$contact_sections->value->language->$lang->phone) }}
                     </div>
                 </div>
-                <div class="contact-widget-box d-flex mt-3">
-                    <div class="contact-icon">
-                        <i class="las la-map-marker"></i>
-                    </div>
-                    <div class="contact-containt">
-                        <h4 class="title">{{ __("Address") }}</h4>
-                        {{ __(@$contact_sections->value->language->$lang->address) }}
-                    </div>
-                </div>
+             
                 <div class="contact-widget-box d-flex mt-3">
                     <div class="contact-icon">
                         <i class="las la-envelope"></i>

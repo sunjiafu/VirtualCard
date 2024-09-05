@@ -48,7 +48,7 @@
                 success: function(response) {
                     if (response.status === 'success') {
                         // 支付成功，跳转并显示成功消息
-                        window.location.href = "{{ route('user.add.money.index') }}".concat("?success=Successfully%20Added%20Money");
+                        window.location.href = "{{ route('user.add.money.index') }}".concat("?success=Successfully");
                     } else if (response.status === 'failed') {
                         // 支付失败，处理失败的逻辑
                         alert('Payment Failed');

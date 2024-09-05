@@ -13,7 +13,7 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
 <section class="banner-section pt-60">
     <div class="baner-element">
-        <img src="https://mukto.appdevs.net/stripcard/assets/images/baner/baner-bg.png">
+        <img src="https://velixpay.com//public/frontend/images/element/home-banner.png">
     </div>
     <div class="container">
         <div class="row align-items-center mb-30-none">
