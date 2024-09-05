@@ -529,14 +529,35 @@ public function epusdtCancel(Request $request)
 
 
 
-    public function waitPage(){
 
-        $page_title =__("Payment Processing");
+public function waitPage(Request $request, $trx_id) {
+    // 1. 查询交易记录
+    $transaction = Transaction::where('trx_id', $trx_id)->first();
+    
 
-        return view('user.sections.add-money.wait',compact('page_title'));
-
-
+    // 检查交易是否存在
+    if (!$transaction) {
+        abort(404, 'Transaction not found');
     }
+
+
+    // 2. 如果是 AJAX 请求，则返回支付状态
+    if ($request->ajax()) {
+        if ($transaction->status === PaymentGatewayConst::STATUSSUCCESS) {
+            return response()->json(['status' => 'success']);
+        } elseif ($transaction->status === 'failed') {
+            return response()->json(['status' => 'failed']);
+        } else {
+            return response()->json(['status' => 'processing']);
+        }
+    }
+
+    // 3. 如果不是 AJAX 请求，渲染支付处理中页面
+    $page_title = __("Payment Processing");
+
+    return view('user.sections.add-money.wait', compact('page_title', 'trx_id'));
+}
+
     /**
      * Redirect Users for collecting payment via Button Pay (JS Checkout)
      */

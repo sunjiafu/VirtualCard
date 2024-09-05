@@ -35,7 +35,7 @@ trait EpusdtTrait
         $parameter = [
             "amount" => (float)$output['amount']->total_amount,
             "order_id" =>  $trx_id,
-            'redirect_url' => route('user.add.money.epusdt.success', ['gateway' => 'epusdt']),
+            'redirect_url' => route('user.add.money.wait.page', ['trx_id' => $trx_id]),
             'notify_url' => route('user.add.money.epusdt.notify'),  // 异步回调URL
         ];
 

@@ -64,6 +64,7 @@ Route::prefix("user")->name("user.")->group(function(){
          Route::get('epusdt/success', 'epusdtSuccess')->name('epusdt.success');
          Route::post('epusdt/notify', 'epusdtNotify')->name('epusdt.notify')->withoutMiddleware(['web', 'auth', 'verification.guard', 'user.google.two.factor']);
          Route::get('epusdt/cancel', 'epusdtCancel')->name('epusdt.cancel');
+         Route::get('payment/success/{trx_id}','waitPage')->name('wait.page');
          //Tatum
         Route::prefix('payment')->name('payment.')->group(function() {
             Route::get('crypto/address/{trx_id}','cryptoPaymentAddress')->name('crypto.address');
