@@ -78,12 +78,12 @@
                             <span class="menu-title">{{ __("My Profile") }}</span>
                         </a>
                     </li>
-                    <li class="sidebar-menu-item">
+                    <!-- <li class="sidebar-menu-item">
                         <a href="{{ setRoute('user.gift.card.index') }}">
                             <i class="menu-icon las la-credit-card"></i>
                             <span class="menu-title">{{ __("Gift Card") }}</span>
                         </a>
-                    </li>
+                    </li> -->
                     <li class="sidebar-menu-item">
                         <a href="{{ setRoute('user.transactions.index') }}">
                             <i class="menu-icon las la-recycle"></i>
