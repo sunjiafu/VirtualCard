@@ -26,7 +26,19 @@
                     <h1 class="title">{{ @$heading[0] }} {{ @$heading[1] }} {{ @$heading[2] }} {{ @$heading[4] }}  <span class="text--base"> {{ @$heading[5] }}  {{ @$heading[6] }}</span>  {{ @$heading[7] }}</h1>
                     <p>{{ __(@$banner->value->language->$lang->sub_heading) }}</p>
                     <div class="banner-btn">
-                        <a href="{{ url('/').'/'.@$banner->value->language->$lang->button_link }}" class="btn--base">{{ __(@$banner->value->language->$lang->button_name) }}</a>
+
+
+                    @auth
+                                    @if(auth()->user()->email_verified == 0)
+                                    <button class="btn--base header-account-btn">{{ __("Start Now") }}</button>
+                                    @else
+                                     <a href="{{ setRoute('user.dashboard') }}" class="btn--base">{{__("Dashboard")}}</a>
+                                    @endif
+
+                                @else
+                                <button class="btn--base header-account-btn">{{ __("Start Now") }}</button>
+                                @endauth
+                        <!-- <a href="{{ url('/').'/'.@$banner->value->language->$lang->button_link }}" class="btn--base">{{ __(@$banner->value->language->$lang->button_name) }}</a> -->
                     </div>
                 </div>
             </div>
