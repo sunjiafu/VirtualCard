@@ -109,7 +109,7 @@ class VirtualcardController extends Controller
         $sender = $this->insertCadrBuy($trx_id, $user, $wallet, $amount, $v_card, $payable);
         $this->insertBuyCardCharge($fixedCharge, $percent_charge, $total_charge, $user, $sender, $v_card->masked_card);
     
-        return redirect()->route("user.virtual.card.index")->with(['success' => [__('Buy Card Successfully')]]);
+        return redirect()->route("user.virtual.card.index")->with(['success' => [__("Buy Card Successfully")]]);
     }
     
   

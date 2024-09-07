@@ -39,6 +39,10 @@
                 <input type="text" class="form-control" id="cvv" name="cvv" value="{{ old('cvv', $card->cvv) }}" required>
             </div>
             <div class="form-group">
+                <label for="cvv">{{ __("Holder Name") }}</label>
+                <input type="text" class="form-control" id="name_on_card" name="name_on_card" value="{{ old('cvv', $card->name_on_card) }}" required>
+            </div>
+            <div class="form-group">
                 <label for="cvv">{{ __("Card_type") }}</label>
                 <input type="text" class="form-control" id="card_type" name="card_type" value="{{ old('card_type', $card->card_type) }}" required>
             </div>

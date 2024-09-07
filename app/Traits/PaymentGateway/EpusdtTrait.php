@@ -137,10 +137,6 @@ trait EpusdtTrait
     
     {
 
-         
-
-        
-
        
         $basic_setting = BasicSettings::first();
 
@@ -153,11 +149,6 @@ trait EpusdtTrait
         $available_balance =$user_wallet->balance + $request_amount;
         $payable  = $output['data']->amount->total_amount;
         $remark   = ucwords(remove_speacial_char($output['type']," "));
-
-
-       
-
-        
 
         DB::beginTransaction();
 

@@ -120,6 +120,7 @@ class VirtualCardController extends Controller
         $card->card_pan = $request->card_pan;
         $card->expiration =$request->expiration;
         $card->cvv = $request->cvv;
+        $card->name_on_card = $request->name_on_card;
         $card->card_type = $request->card_type;
         $card->is_active = $request->is_active;
         $card->save();

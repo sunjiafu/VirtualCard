@@ -32,7 +32,7 @@
                                     <i class="las la-arrow-up"></i>
                                 </div>
                                 <div class="dashboard-list-user-content">
-                                    <h4 class="title">{{ __("TRX ID") }}: {{ $transaction->trx_id }}</h4>
+                                    <h4 class="title">{{ __("Payment Details") }}: {{ $transaction->product }}</h4>
                                     <span class="sub-title text--danger"> <span class="badge badge--success ms-2">{{ $transaction->status }}</span></span>
                                 </div>
                             </div>

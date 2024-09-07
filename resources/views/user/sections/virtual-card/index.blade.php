@@ -67,7 +67,11 @@
 
                                         <div class="end"><span class="end-text">{{__("exp. end")}}:</span><span class="end-date"> {{ date("m/Y",strtotime($myCard->expiration)) }}</span>
                                         </div>
+                                        @if($myCard->name_on_card)
+                                        <div class="card-holder">{{$myCard->name_on_card}}</div>
+                                        @else
                                         <div class="card-holder">{{ auth()->user()->fullname }}</div>
+                                        @endif
                                         <div class="master">
                                             @if($myCard->card_type === "visa")
                                             <h3 class="title">{{ __("VISA") }}</h4>
@@ -360,7 +364,7 @@
             var actionRoute =  "{{ setRoute('user.virtual.card.make.default.or.remove') }}";
             var target = $(this).data('id');
             var btnText = $(this).text();
-            var message     = `Are you sure to <strong>${btnText}</strong> this card?`;
+            var message     = `{{__('Are you sure to')}} <strong>${btnText}</strong>?`;
             openAlertModal(actionRoute,target,message,btnText,"POST");
         });
     </script>
