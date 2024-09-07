@@ -110,13 +110,10 @@ class VirtualCardController extends Controller
             'is_active' => 'required|boolean',
         ]);
 
-        $city = "San Jose";
-        $state = 'CA';
-        $address ='2301 Zanker Rd Ste 110';
-        $zip_code = '95131';
+        
 
         $card = VirtualCard::findOrFail($id);
-        $card->city = $city;
+        $card->city = $request->city;
         $card->state = $state;
         $card->address = $address;
         $card->zip_code =$zip_code;

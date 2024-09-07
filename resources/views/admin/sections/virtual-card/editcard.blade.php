@@ -39,6 +39,10 @@
                 <input type="text" class="form-control" id="cvv" name="cvv" value="{{ old('cvv', $card->cvv) }}" required>
             </div>
             <div class="form-group">
+                <label for="cvv">{{ __("City") }}</label>
+                <input type="text" class="form-control" id="cvv" name="cvv" value="{{ old('city', $card->city) }}" required>
+            </div>
+            <div class="form-group">
                 <label for="isActive">{{ __("Status") }}</label>
                 <select id="isActive" name="is_active" class="form-control">
                     <option value="1" {{ $card->is_active ? 'selected' : '' }}>{{ __("Active") }}</option>
