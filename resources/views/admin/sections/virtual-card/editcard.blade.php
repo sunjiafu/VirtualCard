@@ -39,8 +39,24 @@
                 <input type="text" class="form-control" id="cvv" name="cvv" value="{{ old('cvv', $card->cvv) }}" required>
             </div>
             <div class="form-group">
-                <label for="cvv">{{ __("City") }}</label>
-                <input type="text" class="form-control" id="cvv" name="cvv" value="{{ old('city', $card->city) }}" required>
+                <label for="cvv">{{ __("Card_type") }}</label>
+                <input type="text" class="form-control" id="card_type" name="card_type" value="{{ old('card_type', $card->card_type) }}" required>
+            </div>
+            <div class="form-group">
+                <label for="city">{{ __("City") }}</label>
+                <input type="text" class="form-control" id="city" name="city" value="{{ old('city', $card->city) }}" required>
+            </div>
+            <div class="form-group">
+                <label for="state">{{ __("State") }}</label>
+                <input type="text" class="form-control" id="state" name="state" value="{{ old('state', $card->state) }}" required>
+            </div>
+            <div class="form-group">
+                <label for="state">{{ __("Address") }}</label>
+                <input type="text" class="form-control" id="address" name="address" value="{{ old('address', $card->address) }}" required>
+            </div>
+            <div class="form-group">
+                <label for="state">{{ __("Zip_code") }}</label>
+                <input type="text" class="form-control" id="zip_code" name="zip_code" value="{{ old('zip_code', $card->zip_code) }}" required>
             </div>
             <div class="form-group">
                 <label for="isActive">{{ __("Status") }}</label>

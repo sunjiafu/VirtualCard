@@ -69,8 +69,13 @@
                                         </div>
                                         <div class="card-holder">{{ auth()->user()->fullname }}</div>
                                         <div class="master">
-                                            <div class="circle master-red"></div>
+                                            @if($myCard->card_type === "visa")
+                                            <h3 class="title">{{ __("VISA") }}</h4>
+                                            @else
+                                              <div class="circle master-red"></div>
                                             <div class="circle master-yellow"></div>
+                                            @endif
+
                                         </div>
                                     </div>
                                     <div class="back">

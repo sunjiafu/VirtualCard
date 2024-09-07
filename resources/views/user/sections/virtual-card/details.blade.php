@@ -65,8 +65,12 @@
                                     </div>
                                     <div class="card-holder">{{ auth()->user()->fullname }}</div>
                                     <div class="master">
+                                        @if($myCard->card_type === "visa")
+                                        <h3 class="title">{{ __("VISA") }}</h3>
+                                        @else
                                         <div class="circle master-red"></div>
                                         <div class="circle master-yellow"></div>
+                                        @endif
                                     </div>
                                 </div>
                                 <div class="back">
@@ -116,7 +120,7 @@
                                     <i class="las la-hand-holding-heart"></i>
                                 </div>
                                 <div class="preview-list-user-content">
-                                    <span>{{ __("Card Amount") }}</span>
+                                    <span>{{ __("Current Balance") }}</span>
                                 </div>
                             </div>
                         </div>
@@ -154,7 +158,7 @@
                             <span>{{ @$myCard->card_id }}</span>
                         </div>
                     </div>
-                    <div class="preview-list-item">
+                    <!-- <div class="preview-list-item">
                         <div class="preview-list-left">
                             <div class="preview-list-user-wrapper">
                                 <div class="preview-list-user-icon">
@@ -168,7 +172,7 @@
                         <div class="preview-list-right">
                             <span>{{ @$myCard->account_id }}</span>
                         </div>
-                    </div>
+                    </div> -->
                     <div class="preview-list-item">
                         <div class="preview-list-left">
                             <div class="preview-list-user-wrapper">
@@ -189,7 +193,7 @@
                                @endforeach
                         </div>
                     </div>
-                    <div class="preview-list-item">
+                    <!-- <div class="preview-list-item">
                         <div class="preview-list-left">
                             <div class="preview-list-user-wrapper">
                                 <div class="preview-list-user-icon">
@@ -203,7 +207,7 @@
                         <div class="preview-list-right">
                             <span>{{ @$myCard->masked_card }}</span>
                         </div>
-                    </div>
+                    </div> -->
 
                     <div class="preview-list-item">
                         <div class="preview-list-left">
