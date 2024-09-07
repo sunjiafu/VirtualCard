@@ -217,7 +217,7 @@ trait EpusdtTrait
 
         $notification_content = [
             'title'         => "Add Money",
-            'message'       => "Your Wallet"  . "balance  has been added"  .  $output['data']->amount->requested_amount,
+            'message'       => "Your Wallet balance  has been added"  . "/n".  $output['data']->amount->requested_amount . "$",
             'time'          => Carbon::now()->diffForHumans(),
         ];
 
