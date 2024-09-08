@@ -372,7 +372,7 @@ class VirtualcardController extends Controller
             //notification
              $notification_content = [
                 'title'         =>"Buy Card",
-                'message'       => 'Buy card successful '.$masked_card,
+                'message'       => __("Buy card successful").$masked_card,
                 'image'         => files_asset_path('profile-default'),
             ];
 

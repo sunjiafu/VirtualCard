@@ -525,7 +525,7 @@ class VirtualCardController extends Controller
                 $trx_id =  'CB'.getTrxNum();
                 $sender = $this->insertCadrBuy( $trx_id,$user,$wallet,$amount, $v_card ,$payable);
                 $this->insertBuyCardCharge( $fixedCharge,$percent_charge, $total_charge,$user,$sender,$v_card->masked_card);
-                $message =  ['success'=>[__('Buy Card Successfully')]];
+                $message =  ['success'=>[__('Buy card successful')]];
                 return Helpers::onlysuccess($message);
             }else {
                 $error = ['error'=>[@$result['message']??__("Something Went Wrong! Please Try Again")]];
