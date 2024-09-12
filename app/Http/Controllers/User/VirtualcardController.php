@@ -13,6 +13,7 @@ use App\Models\UserNotification;
 use App\Models\UserWallet;
 use App\Models\VirtualCard;
 use App\Models\VirtualCardApi;
+use App\Models\VirtualCardBin;
 use App\Models\VirtualCardTransaction;
 use Exception;
 use Illuminate\Http\Request;
@@ -38,8 +39,9 @@ class VirtualcardController extends Controller
         $cardCharge = TransactionSetting::where('slug','virtual_card')->where('status',1)->first();
         $cardReloadCharge = TransactionSetting::where('slug','reload_card')->where('status',1)->first();
         $transactions = Transaction::auth()->virtualCard()->latest()->take(10)->get();
+        $card_bin = VirtualCardBin::all();
         $cardApi = $this->api;
-        return view('user.sections.virtual-card.index',compact('page_title','myCards','transactions','cardCharge','cardApi','totalCards','cardReloadCharge'));
+        return view('user.sections.virtual-card.index',compact('page_title','myCards','transactions','cardCharge','cardApi','totalCards','cardReloadCharge','card_bin'));
     }
     public function cardDetails($card_id)
     {
@@ -53,10 +55,12 @@ class VirtualcardController extends Controller
     {
         $request->validate([
             'card_amount' => 'required|numeric|gt:0',
+            'card_bin' =>'required',
         ]);
     
         $user = auth()->user();
         $amount = $request->card_amount;
+        $card_bin = $request->card_bin;
         $wallet = UserWallet::where('user_id', $user->id)->first();
         if (!$wallet) {
             return back()->with(['error' => [__('User wallet not found')]]);
@@ -97,6 +101,7 @@ class VirtualcardController extends Controller
         $v_card->secret = $trx;
         $v_card->bg = "DeepBlue";
         $v_card->amount = $amount;
+        $v_card ->card_bin =$card_bin;
         $v_card->currency = $currency;
         $v_card->charge = $total_charge;
         $v_card->is_active = 0;  // 卡片默认未激活

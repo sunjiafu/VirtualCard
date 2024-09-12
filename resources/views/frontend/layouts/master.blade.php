@@ -27,8 +27,8 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta property="og:title" content="{{ __(@$seo_data->title) }}">
     <meta name="keywords" content="{{ implode(',',@$seo_data->tags) }}">
-    <meta property="og:description" content="{{ __(@$seo_data->desc) }}">
-    <meta property="og:image" content="{{get_image(@$seo_data->image,'seo') }}">
+    <meta property="og:description" content="{{ __(key: @$seo_data->desc) }}">
+    <meta property="og:image" content="{{get_image(@$seo_data->image,path_type: 'seo') }}">
     <meta property="og:image:width" content="140">
     <meta property="og:image:height" content="80">
     <title>{{ $basic_settings->sitename(__($page_title??'')) }}</title>

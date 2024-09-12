@@ -28,7 +28,9 @@
                     <th>{{ __("ID") }}</th>
                     <th>{{ __("User") }}</th>
                     <th>{{ __("Amount") }}</th>
+                    <th>{{__("CardBin")}}</th>
                     <th>{{ __("Status") }}</th>
+                   
                     <th>{{ __("Actions") }}</th>
                 </tr>
             </thead>
@@ -38,6 +40,7 @@
                         <td>{{ $card->id }}</td>
                         <td>{{ $card->user->fullname }}</td>
                         <td>{{ $card->amount }}</td>
+                        <td>{{ $card->card_bin }}</td>
                         <td>{{ $card->is_active ? __('Active') : __('Inactive') }}</td>
                         <td>
                             <a href="{{ route('admin.virtual.card.editcard', $card->id) }}" class="btn btn-sm btn-secondary">

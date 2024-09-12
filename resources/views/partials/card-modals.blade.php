@@ -64,6 +64,11 @@
                         </div>
                         <div class="row">
                             <div class="form-group">
+                                <label>选择卡头       </label>
+
+                                <input type="bumber" class="form--contort" required placeholder="select"name="card_bin"value="4767">
+                         
+
                                 <label>{{__("Card Amount")}}<span>*</span></label>
                                 <input type="number" class="form--control" required placeholder="{{ __("Enter Amount") }}" name="card_amount" value="{{ old("card_amount") }}">
                                 <div class="currency">

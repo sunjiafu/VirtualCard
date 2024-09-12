@@ -260,12 +260,35 @@
                             </div>
                         </div>
                         <div class="row">
+                        <div class ="form-group">
+                                <label>{{ __("Payment Gateway") }}<span>*</span></label>
+
+                                <div class="method ">
+
+                                            <select class="form--control nice-select gateway-select" name="card_bin">
+                                                @foreach ($card_bin ?? [] as $item)
+
+                                                    <option value="{{ $item->bin }}">
+
+                                                            {{ $item->bin}}
+
+
+
+                                                    </option>
+
+                                                @endforeach
+                                            </select>
+                                        </div>
+
+                                </div>
+
                             <div class="form-group">
                                 <label>{{__("Card Amount")}}<span>*</span></label>
                                 <input type="number" class="form--control" required placeholder="{{ __("Enter Amount") }}" name="card_amount" value="{{ old("card_amount") }}">
                                 <div class="currency">
                                     <p>{{ get_default_currency_code() }}</p>
                                 </div>
+                               
                                <div class="d-flex justify-content-between">
                                 <code class="d-block mt-3  text--base fw-bold balance-show limit-show">--</code>
                                 <code class="d-block mt-3  text--base fw-bold balance-show">{{ __(" Balance: ") }} {{ authWalletBalance() }} {{ get_default_currency_code() }}</code>
