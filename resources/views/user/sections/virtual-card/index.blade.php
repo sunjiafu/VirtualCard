@@ -261,7 +261,7 @@
                         </div>
                         <div class="row">
                         <div class ="form-group">
-                                <label>{{ __("Payment Gateway") }}<span>*</span></label>
+                                <label>{{ __("Select Card Bin") }}<span>*</span></label>
 
                                 <div class="method ">
 
