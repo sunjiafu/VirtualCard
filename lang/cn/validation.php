@@ -159,6 +159,21 @@ return [
         'attribute-name' => [
             'rule-name' => 'custom-message',
         ],
+
+        'firstname' => [
+        'required' => '请填写名字。',
+        'regex' => '名字只能包含英文字符。',
+    ],
+    'lastname' => [
+        'required' => '请填写姓氏。',
+        'regex' => '姓氏只能包含英文字符。',
+    ],
+
+    'agree' =>[
+
+        'required' =>'请同意我们的隐私调条款'
+    ],
+        
     ],
 
     /*
@@ -175,6 +190,7 @@ return [
     'attributes' => [
 
         'register password' =>'密码',
+       
 
     ],
 

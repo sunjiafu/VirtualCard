@@ -60,7 +60,7 @@ class RegisterController extends Controller
      */
     public function register(Request $request)
     {
-        $validated = $this->validator($request->all())->validate();
+        $validated = $this->validator(data: $request->all())->validate();
 
         $basic_settings             = $this->basic_settings;
 
@@ -107,7 +107,7 @@ class RegisterController extends Controller
         }
 
         return Validator::make($data,[
-            'firstname'     => 'required|string|max:60',
+            'firstname'     => 'required|string|max:60|regex:/^[A-Za-z]+$/',
             'lastname'      => 'required|string|max:60',
             'register_email'         => 'required|string|email|max:150|unique:users,email',
             'register_password'      => $passowrd_rule,
