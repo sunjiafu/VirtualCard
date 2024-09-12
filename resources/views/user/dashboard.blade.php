@@ -61,17 +61,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-xxl-3 col-xl-4 col-lg-4 col-md-6 col-sm-6 mb-20">
-                    <div class="dashbord-item">
-                        <div class="dashboard-content">
-                            <span class="sub-title">{{ __("Total Gift Cards") }}</span>
-                            <h4 class="title">{{ $totalGiftCards }}</h4>
-                        </div>
-                        <div class="dashboard-icon">
-                            <i class="menu-icon las la-credit-card"></i>
-                        </div>
-                    </div>
-                </div>
+              
             </div>
         </div>
     </div>
