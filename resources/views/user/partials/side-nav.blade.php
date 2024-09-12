@@ -131,4 +131,6 @@
             openAlertModal(actionRoute,target,message,logout,"POST");
         });
     </script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-5QT8DEH80J"></script>
+
 @endpush
