@@ -16,13 +16,13 @@ class BasicSettingsSeeder extends Seeder
     public function run()
     {
         $data = [
-            'site_name'         => "StripCard",
+            'site_name'         => "VelixPay",
             'site_title'        => " Virtual Credit Card Solution",
             'base_color'        => "#635BFF",
             'web_version'       => "3.6.0",
             'secondary_color'   => "#ea5455",
             'otp_exp_seconds'   => "3600",
-            'timezone'          => "Asia/Dhaka",
+            'timezone'          => "Asia/Hong_Kong",
             'site_logo_dark'        => "seeder/logo-white.png",
             'site_logo'             => "seeder/logo-dark.png",
             'site_fav_dark'         => "seeder/favicon-dark.png",
@@ -40,7 +40,7 @@ class BasicSettingsSeeder extends Seeder
                 "password" => "",
                 "username" => "",
                 "from" => "",
-                "app_name" => "",
+                "app_name" => "VelixPay",
             ],
             'broadcast_config'  => [
                 "method" => "pusher",
