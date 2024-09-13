@@ -65,6 +65,47 @@
             </div>
         </div>
     </div>
+
+    <!-- 专属客服 -->
+
+    <div class="dashboard-item-area mt-40">
+    <div class="dashboard-header-wrapper">
+        <h4 class="title">{{ __("您的客户经理") }}</h4>
+    </div>
+    <div class="row mb-20-none">
+    
+    <div class="col-xxl-6 col-xl-6 col-lg-6 col-md-6 col-sm-6 mb-20 customer-service">
+    <div class="dashbord-item">
+        <div class="dashboard-content">
+            <span class="sub-title">{{ __("微信客服") }}</span>
+            <a href="javascript:;" class="btn--base weixin">
+                <i class="fab fa-weixin"></i> {{ __("联系客服") }}
+                <img class="qrcode" src="{{ asset('public/frontend/') }}/images/element/wechat_qr.jpg" alt="WeChat QR Code">
+            </a>
+        </div>
+        <div class="dashboard-icon">
+            <i class="fab fa-weixin"></i>
+        </div>
+    </div>
+</div>
+
+        <div class="col-xxl-6 col-xl-6 col-lg-6 col-md-6 col-sm-6 mb-20">
+            <div class="dashbord-item">
+                <div class="dashboard-content">
+                    <span class="sub-title">{{ __("Telegram客服") }}</span>
+                    <a href="https://t.me/larienasoft" class="btn--base">
+                        <i class="fab fa-telegram"></i> {{ __("联系客服") }}
+                    </a>
+                </div>
+                <div class="dashboard-icon">
+                    <i class="fab fa-telegram"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 客服结束 -->
     <div class="dashboard-list-area mt-60">
         <div class="dashboard-header-wrapper">
             <h4 class="title">{{ __("Latest Transactions") }}</h4>
@@ -80,4 +121,7 @@
     </div>
 
 </div>
+
+
 @endsection
+

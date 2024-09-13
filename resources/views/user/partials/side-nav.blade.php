@@ -141,4 +141,17 @@
   gtag('config', 'G-5QT8DEH80J');
 </script>
 
+<!-- 微信客服 -->
+<script>
+
+$(document).ready(function() {
+    $('#wechatService').hover(
+        function() { $('#wechatQRCode').show(); },
+        function() { $('#wechatQRCode').hide(); }
+    );
+});
+
+
+
+</script>
 @endpush

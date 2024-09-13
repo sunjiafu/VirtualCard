@@ -6227,3 +6227,31 @@ input:focus {
     margin-bottom: 0;
     padding-bottom: 0;
 }
+/* 微信客服二维码 */
+
+.weixin {
+  position: relative;
+}
+
+.weixin img.qrcode {
+  position: absolute;
+  z-index: 99;
+  top: -135px;
+  right: -28px;
+  width: 150px;
+  height: 150px;
+  transform: scale(0);
+  transform-origin: top right;
+  opacity: 0;
+  border: 5px solid #0095ba;
+  border-radius: 4px;
+  transition: all .4s ease-in-out;
+}
+
+.weixin:hover img.qrcode {
+  transform: scale(1);
+  opacity: 1;
+}
+
+
+/* 微信客服二维码结束 */
