@@ -10,10 +10,10 @@
 @endsection
 
 @section('content')
-<div class="body-wrapper">
+<div class="body-wrapper ">
     <div class="dashboard-area mt-10">
         <div class="dashboard-header-wrapper">
-            <h3 class="title">{{ __("Welcome Back") }}, <span>{{ @$user->fullname }}</span></h3>
+            <h3 class="title">{{ __("Welcome Back") }}, <span>{{ @$user->username }}</span></h3>
         </div>
         <div class="dashboard-item-area">
             <div class="row mb-20-none">
@@ -21,7 +21,7 @@
                     <div class="dashbord-item">
                         <div class="dashboard-content">
                             <span class="sub-title">{{__("Current Balance")}}</span>
-                            <h4 class="title">{{ @$baseCurrency->symbol }}{{ authWalletBalance() }}</h4>
+                            <h4 class="title text-light	">{{ @$baseCurrency->symbol }}{{ authWalletBalance() }}</h4>
                         </div>
                         <div class="dashboard-icon">
                             <i class="las la-dollar-sign"></i>
@@ -32,7 +32,7 @@
                     <div class="dashbord-item">
                         <div class="dashboard-content">
                             <span class="sub-title">{{ __("Total Add Money") }}</span>
-                            <h4 class="title">{{ @$baseCurrency->symbol }}{{ getAmount(@$totalAddMoney,2) }}</h4>
+                            <h4 class="title text-light	">{{ @$baseCurrency->symbol }}{{ getAmount(@$totalAddMoney,2) }}</h4>
                         </div>
                         <div class="dashboard-icon">
                             <i class="menu-icon las la-cloud-upload-alt"></i>

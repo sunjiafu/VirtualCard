@@ -8,11 +8,15 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $basic_settings->sitename(__($page_title??'')) }}</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    @include('partials.header-asset')
+    @include('partials.header-asset-muban')
+    
+
 
     @stack('css')
 </head>
+
 <body class="{{ selectedLangDir() ?? "ltr"}}">
+
 <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Start Preloader
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
@@ -30,10 +34,13 @@
     End Preloader
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
 
-@include('frontend.partials.preloader')
-@yield("content")
+   {{-- Start Meau --}}
+@include('frontend.partials.header_muban')
 
-@include('partials.footer-asset')
+
+@yield("content")
+@include('frontend.partials.footer-muban')
+@include('partials.footer-asset-muban')
 @include('frontend.partials.extensions.tawk-to')
 
 @stack('script')

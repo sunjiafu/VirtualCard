@@ -46,7 +46,7 @@ class RegisterController extends Controller
         $user_country = geoip()->getLocation($client_ip)['country'] ?? "";
 
         $page_title = __("User Registration");
-        return view('user.auth.register',compact(
+        return view('user.auth.registers',data: compact(
             'page_title',
             'user_country',
         ));
@@ -70,7 +70,7 @@ class RegisterController extends Controller
         $validated['kyc_verified']      = ($basic_settings->kyc_verification == true) ? false : true;
         $validated['email']          = $validated['register_email'];
         $validated['password']          = Hash::make($validated['register_password']);
-        $validated['username']          = make_username($validated['firstname'],$validated['lastname']);
+        $validated['username']          = $validated['register_username'];
         $validated['address']           = [
                                                 'country' => '',
                                                 'city' => '',
@@ -107,8 +107,9 @@ class RegisterController extends Controller
         }
 
         return Validator::make($data,[
-            'firstname'     => 'required|string|max:60|regex:/^[A-Za-z]+$/',
-            'lastname'      => 'required|string|max:60',
+            // 'firstname'     => 'required|string|max:60|regex:/^[A-Za-z]+$/',
+            // 'lastname'      => 'required|string|max:60',
+            'register_username' =>'required|string|max:60|regex:/^[A-Za-z]+$/',
             'register_email'         => 'required|string|email|max:150|unique:users,email',
             'register_password'      => $passowrd_rule,
             'agree'         => $agree,

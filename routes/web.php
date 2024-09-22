@@ -27,8 +27,8 @@ Route::controller(SiteController::class)->group(function(){
     Route::get('/','home')->name('index');
     Route::get('about','about')->name('about');
     Route::get('services','services')->name('services');
-    Route::get('announcement','blog')->name('announcement');
-    Route::get('announcement/details/{id}/{slug}','blogDetails')->name('blog.details');
+    Route::get('help','blog')->name('announcement');
+    Route::get('help/details/{id}/{slug}','blogDetails')->name('blog.details');
     Route::get('announcement/by/category/{id}/{slug}','blogByCategory')->name('blog.by.category');
     Route::get('contact','contact')->name('contact');
     Route::post('contact/store','contactStore')->name('contact.store');
@@ -36,6 +36,7 @@ Route::controller(SiteController::class)->group(function(){
     Route::get('page/{slug}','usefulPage')->name('useful.link');
     Route::get('cookie/accept','cookieAccept')->name('cookie.accept');
     Route::get('cookie/decline','cookieDecline')->name('cookie.decline');
+    Route::get('muban','muban');
 });
 
 //for sslcommerz callback urls(web)

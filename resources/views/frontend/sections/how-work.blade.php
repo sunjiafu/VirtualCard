@@ -18,7 +18,7 @@ $work = App\Models\Admin\SiteSections::getData( $work_slug)->first();
             @php
                 $num += 1;
             @endphp
-            <div class="col-xl-4 col-lg-4 col-md-4">
+            <div class="col-xl-4 col-lg-4 col-md-4 wow fadeInUp"    data-wow-delay=".15s">
                 <div class="how-it-work-number">
                     <span>0{{  @$num }}</span>
                 </div>

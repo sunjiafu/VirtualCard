@@ -1,4 +1,4 @@
-@extends('frontend.layouts.master')
+@extends('frontend.layouts.master_muban')
 
 @php
     $lang = selectedLang();
@@ -9,56 +9,60 @@
 
 @section('content')
 
-<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Start Blog
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-<section class="blog-section ptb-120">
+    <!-- ====== Banner Start ====== -->
+    <section class="ud-page-banner">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="ud-banner-content">
+                <h1>Blog Page</h1>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- ====== Banner End ====== -->
+
+ <!-- ====== Blog Start ====== -->
+ <section class="ud-blog-grids">
+
     <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-xl-7 col-lg-7 text-center">
-                <div class="section-header">
-                    <span class="text--base">{{ __(@$blog_section->value->language->$lang->title) }}</span>
-                    <h2 class="section-title">{{ __(@$blog_section->value->language->$lang->heading) }}</h2>
-                </div>
-            </div>
-        </div>
-        <div class="row justify-content-center mb-30-none">
-            <div class="col-xl-12 col-lg-12 col-md-12 mb-30">
-                <div class="row justify-content-center mb-30-none">
-                    @foreach ($blogs??[] as $blog)
-                    <div class="col-xl-4 col-lg-4 col-md-6 mb-30">
-                        <div class="blog-item">
-                            <div class="blog-thumb">
-                                <img src="{{ get_image(@$blog->image,'blog') }}" alt="blog">
-                            </div>
-                            <div class="blog-content">
-                                <h4 class="title"><a href="{{route('blog.details',[$blog->id,$blog->slug])}}">{{ @$blog->name->language->$lang->name }}</a></h4>
-                                <p>
-                                    {{textLength(strip_tags(@$blog->details->language->$lang->details,120))}}
-                                </p>
-                                <div class="blog-btn d-flex justify-content-between">
-                                    <span><i class="las la-history"></i> {{showDate(@$blog->created_at)}}</span>
-                                    <a href="{{route('blog.details',[$blog->id,$blog->slug])}}">{{ __("Read More") }} <i class="las la-angle-right"></i></a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                 @endforeach
+      <div class="row">
+        @foreach ($blogs??[] as $blog)
 
-                </div>
+        <div class="col-lg-4 col-md-6">
+          <div class="ud-single-blog">
+            <div class="ud-blog-image">
+              <a href="{{route('blog.details',[$blog->id,$blog->slug])}}">
+                <img src={{ get_image(@$blog->image,'blog') }} alt="blog" />
+              </a>
             </div>
+            <div class="ud-blog-content">
+              <span class="ud-blog-date">{{showDate(@$blog->created_at)}}</span>
+              <h3 class="ud-blog-title">
+                <a href="{{route('blog.details',[$blog->id,$blog->slug])}}">
+                    {{ @$blog->name->language->$lang->name }}                </a>
+              </h3>
+              <p class="ud-blog-desc">
+                {{textLength(strip_tags(@$blog->details->language->$lang->details,120))}}
 
+              </p>
+            </div>
+          </div>
+        
         </div>
-        <nav>
-            <ul class="pagination">
-                {{ get_paginate($blogs) }}
-            </ul>
-        </nav>
+
+        @endforeach
+      </div>
+
+      <nav>
+        <ul class="pagination">
+            {{ get_paginate($blogs) }}
+        </ul>
+    </nav>
     </div>
-</section>
-<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    End Blog
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+  </section>
+  <!-- ====== Blog End ====== -->
 @endsection
 
 

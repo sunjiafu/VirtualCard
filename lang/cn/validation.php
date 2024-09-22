@@ -169,10 +169,16 @@ return [
         'regex' => '姓氏只能包含英文字符。',
     ],
 
+    'register_email'=>[
+        'required' =>'请输入您的邮箱',
+        'unique' => '您输入的邮箱已存在',
+    ],
+
     'agree' =>[
 
         'required' =>'请同意我们的隐私调条款'
     ],
+
         
     ],
 
@@ -190,8 +196,12 @@ return [
     'attributes' => [
 
         'register password' =>'密码',
+
+        'register email' =>'注册邮箱'
        
 
     ],
 
 ];
+
+

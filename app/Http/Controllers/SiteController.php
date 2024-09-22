@@ -19,7 +19,12 @@ class SiteController extends Controller
         $basic_settings = BasicSettings::first();
         $page_title = $basic_settings->site_title??"Home";
 
-        return view('frontend.index',compact('page_title'));
+        return view('frontend.muban',compact('page_title'));
+    }
+
+    public function muban(){
+
+        return view('frontend.muban');
     }
 
     public function about(){
@@ -31,18 +36,22 @@ class SiteController extends Controller
         return view('frontend.services',compact('page_title'));
     }
     public function blog(){
-        $page_title = "Announcements";
+
+        $page_title = "Help";
         $categories = BlogCategory::active()->latest()->get();
         $blogs = Blog::active()->orderBy('id',"DESC")->paginate(8);
         $recentPost = Blog::active()->latest()->limit(3)->get();
         return view('frontend.blogs',compact('page_title','blogs','recentPost','categories'));
     }
     public function blogDetails($id,$slug){
-        $page_title = "Announcement Details";
+        
         $categories = BlogCategory::active()->latest()->get();
         $blog = Blog::where('id',$id)->where('slug',$slug)->first();
+        $lang = selectedLang();
+        $page_title =$blog->name->language->$lang->name;
+       
         $recentPost = Blog::active()->where('id',"!=",$id)->latest()->limit(3)->get();
-        return view('frontend.blogDetails',compact('page_title','blog','recentPost','categories'));
+        return view('frontend.blogDetails',compact('page_title','blog','recentPost','categories',));
     }
     public function blogByCategory($id,$slug){
         $categories = BlogCategory::active()->latest()->get();
@@ -54,7 +63,7 @@ class SiteController extends Controller
     }
     public function contact(){
         $page_title = "Contact";
-        return view('frontend.contact',compact('page_title'));
+        return view('frontend.contact-muban',compact('page_title'));
     }
     public function contactStore(Request $request){
         if($request->ajax()){

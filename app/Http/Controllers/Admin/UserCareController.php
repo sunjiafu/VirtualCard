@@ -214,10 +214,10 @@ class UserCareController extends Controller
     {
         $request->merge(['username' => $username]);
         $validator = Validator::make($request->all(),[
-            'username'              => "nullable|exists:users,username",
-            'firstname'             => "required|string|max:60",
-            'lastname'              => "required|string|max:60",
-            'mobile_code'           => "required|string|max:10",
+            'username'              => "required|string|max:60",
+            'firstname'             => "nullable|string|max:60",
+            'lastname'              => "nullable|string|max:60",
+            'mobile_code'           => "nullable|string|max:10",
             'mobile'                => "required|string|max:20",
             'address'               => "nullable|string|max:250",
             'country'               => "nullable|string|max:50",

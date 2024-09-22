@@ -5,3 +5,12 @@ $body-bg: #f8fafc;
 $font-family-sans-serif: 'Nunito', 'Microsoft YaHei', 'SimSun',sans-serif;
 $font-size-base: 0.9rem;
 $line-height-base: 1.6;
+
+// Responsive Variables
+$xl-desktop: "only screen and (min-width: 1921px)";
+$desktop: "only screen and (min-width: 1400px) and (max-width: 1920px)";
+$laptop: "only screen and (min-width: 1200px) and (max-width: 1399px)";
+$lg: "only screen and (min-width: 992px) and (max-width: 1199px)";
+$md: "only screen and (min-width: 768px) and (max-width: 991px)";
+$xs: "(max-width: 767px)";
+$sm: "only screen and (min-width: 576px) and (max-width: 767px)";

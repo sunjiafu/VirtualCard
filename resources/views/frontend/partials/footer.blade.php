@@ -56,4 +56,9 @@
 
   gtag('config', 'G-5QT8DEH80J');
 </script>
+
+    <!-- ====== Back To Top Start ====== -->
+    <a href="javascript:void(0)" class="back-to-top">
+        <i class="lni lni-chevron-up"> </i>
+      </a>
 </footer>

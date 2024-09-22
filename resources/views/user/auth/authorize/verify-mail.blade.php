@@ -1,62 +1,69 @@
-
-@extends('frontend.layouts.master')
+@extends('frontend.layouts.master_muban')
 @section('content')
 
-    <section class="verification-otp ptb-60">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-xl-6 col-lg-8 col-md-10 col-sm-12">
-                    <div class="verification-otp-area">
-                        <div class="account-wrapper otp-verification ">
-                            <div class="account-logo text-center">
-                                <a class="site-logo" href="{{ setRoute('index') }}">
-                                    <img src="{{ get_logo($basic_settings) }}"  data-white_img="{{ get_logo($basic_settings,'white') }}"
-                                    data-dark_img="{{ get_logo($basic_settings,'dark') }}"
-                                        alt="site-logo">
-                                </a>
-                            </div>
+   {{-- Banner Start --}}
 
-                            <div class="verification-otp-content ptb-30">
-                                <h3 class="title">{{ __("Account Authorization") }}</h3>
-                                <p>{{ __("Need to verify your account. Please check your mail inbox to get the authorization code") }}</p>
-                            </div>
-                            <form action="{{ setRoute('user.authorize.mail.verify',$token) }}" class="account-form" method="POST">
-                                @csrf
-                                <div class="row ml-b-20">
-                                    <div class="col-lg-12 form-group">
-                                        <div class="col-lg-12 form-group">
-                                            <input class="otp" name="code[]" type="text" oninput='digitValidate(this)' onkeyup='tabChange(1)'
-                                            maxlength=1 required>
-                                        <input class="otp" name="code[]" type="text" oninput='digitValidate(this)' onkeyup='tabChange(2)'
-                                            maxlength=1 required>
-                                        <input class="otp" name="code[]" type="text" oninput='digitValidate(this)' onkeyup='tabChange(3)'
-                                            maxlength=1 required>
-                                        <input class="otp" name="code[]" type="text" oninput='digitValidate(this)' onkeyup='tabChange(4)'
-                                            maxlength=1 required>
-                                        <input class="otp" name="code[]" type="text" oninput='digitValidate(this)' onkeyup='tabChange(5)'
-                                            maxlength=1 required>
-                                        <input class="otp" name="code[]" type="text" oninput='digitValidate(this)' onkeyup='tabChange(6)'
-                                            maxlength=1 required>
-                                        @error("code")
-                                            <span class="invalid-feedback d-block" role="alert">
-                                                <strong>{{ $message }}</strong>
-                                            </span>
-                                        @enderror
-                                    </div>
-                                    <div class="col-lg-12 form-group ">
-                                        <div class="time-area">{{ __("You can resend the code after") }} <span id="time"></span></div>
-                                    </div>
-                                    <div class="col-lg-12 form-group text-center">
-                                        <button type="submit" class="btn--base btn w-100 btn-loading">{{ __("Verify") }}</button>
-                                    </div>
-                                </div>
-                            </form>
+   <section class="ud-page-banner">
+    <div class="container-up">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="ud-banner-content">
+                    <h1>Email Verification</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="verification-otp ptb-60">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-xl-6 col-lg-8 col-md-10 col-sm-12">
+                <div class="verification-otp-area">
+                    <div class="account-wrapper otp-verification text-center">
+                        <div class="account-logo mb-5">
+                            <a class="site-logo" href="{{ setRoute('index') }}">
+                                <img src="{{ get_logo($basic_settings) }}" data-white_img="{{ get_logo($basic_settings,'white') }}"
+                                    data-dark_img="{{ get_logo($basic_settings,'dark') }}" alt="site-logo">
+                            </a>
                         </div>
+
+                        <div class="verification-otp-content ptb-30">
+                            <h3 class="title mb-3">{{ __("验证您的帐户") }}</h3>
+                            <p class="text-muted mb-4">{{ __("请检查您的邮箱，输入我们发送给您的代码") }}</p>
+                        </div>
+
+                        <!-- 验证表单 -->
+                        <form action="{{ setRoute('user.authorize.mail.verify',$token) }}" class="account-form" method="POST">
+                            @csrf
+                            <div class="row justify-content-center">
+                                <div class="col-lg-12 form-group d-flex justify-content-between mb-4">
+                                    <!-- 优化验证码输入框 -->
+                                    @for ($i = 1; $i <= 6; $i++)
+                                    <input class="otp text-center mx-1" name="code[]" type="text" oninput='digitValidate(this)' onkeyup='tabChange({{ $i }})'
+                                        maxlength=1 required style="width: 50px; font-size: 24px; padding: 10px; border-radius: 5px; border: 1px solid #ccc;">
+                                    @endfor
+                                    @error("code")
+                                    <span class="invalid-feedback d-block" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                    @enderror
+                                </div>
+                                <div class="col-lg-12 text-center">
+                                    <div class="time-area text-muted">{{ __("You can resend the code after") }} <span id="time"></span></div>
+                                </div>
+                                <div class="col-lg-12 text-center mt-4">
+                                    <button type="submit" class="btn btn-primary w-100 btn-loading">{{ __("验证") }}</button>
+                                </div>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
+</section>
+
 @endsection
 
 @push('script')
@@ -68,55 +75,57 @@
     let tabChange = function (val) {
         let ele = document.querySelectorAll('.otp');
         if (ele[val - 1].value != '') {
-            ele[val].focus()
+            if (val < 6) ele[val].focus(); // 移动到下一个输入框
         } else if (ele[val - 1].value == '') {
-            ele[val - 2].focus()
+            if (val > 1) ele[val - 2].focus(); // 回到前一个输入框
         }
     }
 </script>
+
 <script>
     var convertAsSecond = "{{ global_const()::USER_VERIFY_RESEND_TIME_MINUTE }}" * 60;
-    function resetTime (second = convertAsSecond) {
-        var coundDownSec = second;
+
+    function resetTime(second = convertAsSecond) {
+        var countdownSec = second;
         var countDownDate = new Date();
         countDownDate.setMinutes(countDownDate.getMinutes() + 120);
-        var x = setInterval(function () {  // Get today's date and time
-            var now = new Date().getTime();  // Find the distance between now and the count down date
-            var distance = countDownDate - now;  // Time calculations for days, hours, minutes and seconds  var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            var minutes = Math.floor((distance % (1000 * coundDownSec)) / (1000 * coundDownSec));
-            var seconds = Math.floor((distance % (1000 * coundDownSec)) / 1000);  // Output the result in an element with id="time"
-            document.getElementById("time").innerHTML =seconds + "s ";  // If the count down is over, write some text
 
-            if (distance < 0 || second < 2 ) {
+        var x = setInterval(function () {
+            var now = new Date().getTime();
+            var distance = countDownDate - now;
+            var minutes = Math.floor((distance % (1000 * countdownSec)) / (1000 * countdownSec));
+            var seconds = Math.floor((distance % (1000 * countdownSec)) / 1000);
 
+            document.getElementById("time").innerHTML = seconds + "s ";
+
+            if (distance < 0 || second < 2) {
                 clearInterval(x);
-
-                document.querySelector(".time-area").innerHTML = "Didn't get the code? <a href='{{ setRoute('user.authorize.resend.code') }}' onclick='resendOtp()' class='text--danger'>Resend</a>";
+                document.querySelector(".time-area").innerHTML = "Didn't get the code? <a href='{{ setRoute('user.authorize.resend.code') }}' class='text-danger'>Resend</a>";
             }
 
-            second--
+            second--;
         }, 1000);
     }
 
     resetTime();
 </script>
+
 <script>
-    $(".otp").parents("form").find("input[type=submit],button[type=submit]").click(function(e){
+    $(".otp").parents("form").find("input[type=submit],button[type=submit]").click(function (e) {
         var otps = $(this).parents("form").find(".otp");
         var result = true;
-        $.each(otps,function(index,item){
-            if($(item).val() == "" || $(item).val() == null) {
+        $.each(otps, function (index, item) {
+            if ($(item).val() == "" || $(item).val() == null) {
                 result = false;
             }
         });
 
-        if(result == false) {
+        if (result == false) {
             $(this).parents("form").find(".otp").addClass("required");
-        }else {
+        } else {
             $(this).parents("form").find(".otp").removeClass("required");
             $(this).parents("form").submit();
         }
     });
 </script>
 @endpush
-

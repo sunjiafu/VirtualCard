@@ -160,24 +160,17 @@
             <form class="card-form" method="POST" action="{{ setRoute('admin.users.details.update',$user->username) }}">
                 @csrf
                 <div class="row mb-10-none">
+                   
                     <div class="col-xl-6 col-lg-6 form-group">
                         @include('admin.components.form.input',[
-                             'label'         => __("first Name")."*",
-                            'name'          => "firstname",
-                            'value'         => old("firstname",$user->firstname),
+                            'label'         => __("User Name")."*",
+                            'name'          => "username",
+                            'value'         => old("username",$user->username),
                             'attribute'     => "required",
 
                         ])
                     </div>
-                    <div class="col-xl-6 col-lg-6 form-group">
-                        @include('admin.components.form.input',[
-                            'label'         => __("last Name")."*",
-                            'name'          => "lastname",
-                            'value'         => old("lastname",$user->lastname),
-                            'attribute'     => "required",
 
-                        ])
-                    </div>
                     <div class="col-xl-6 col-lg-6 form-group">
                         <label>{{ __("phone Number") }}<span>*</span></label>
                         <div class="input-group">

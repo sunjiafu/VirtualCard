@@ -82,7 +82,7 @@
 
 @stack('script')
 
-<script>
+{{-- <script>
     var status = "{{  @$cookie->status }}";
      //cookies results
      var approval_status      = "{{ $approval_status}}";
@@ -112,7 +112,7 @@
     }
 
     // })
-</script>
+</script> --}}
 <script>
     (function ($) {
         "use strict";

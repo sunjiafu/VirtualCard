@@ -1,5 +1,6 @@
 <!-- favicon -->
 <link rel="shortcut icon" href="{{ get_fav($basic_settings) }}" type="image/x-icon">
+
  <!-- fontawesome css link -->
  <link rel="stylesheet" href="{{ asset('public/frontend/') }}/css/fontawesome-all.css">
  <!-- bootstrap css link -->
@@ -19,6 +20,7 @@
  <link rel="stylesheet" href="{{ asset('public/frontend/') }}/css/nice-select.css">
  <!-- main style css link -->
  <link rel="stylesheet" href="{{ asset('public/frontend/') }}/css/style.css">
+ @vite(['resources/sass/app.scss', 'resources/js/app.js'])
 
  @php
  $color = @$basic_settings->base_color ?? '#000000';

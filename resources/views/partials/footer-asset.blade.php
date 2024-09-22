@@ -15,7 +15,11 @@
   <!-- nice select js -->
 <script src="{{ asset('public/frontend/') }}/js/jquery.nice-select.js"></script>
 <!-- main -->
+<script src="{{ asset('public/frontend/') }}/js/wow.min.js"></script>
 <script src="{{ asset('public/frontend/') }}/js/main.js"></script>
+
+
+
 
 <script>
     $(".langSel").on("change", function() {
