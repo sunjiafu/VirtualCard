@@ -97,7 +97,6 @@
   <!-- ====== Contact End ====== -->
 
   @endsection
-
 @push('script')
 <script>
 
@@ -170,3 +169,4 @@
 </script>
 
 @endpush
+

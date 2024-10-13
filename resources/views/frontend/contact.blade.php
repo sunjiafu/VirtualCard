@@ -69,6 +69,8 @@
                     <div class="contact-containt">
                         <h4 class="title">{{ __("Email Address") }}</h4>
                         {{ __(@$contact_sections->value->language->$lang->email) }}
+
+                        
                     </div>
                 </div>
             </div>
@@ -80,7 +82,6 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
 
 @endsection
-
 @push('script')
 <script>
 
@@ -120,3 +121,4 @@
     //*************** Contact Form Submit End ******************
 </script>
 @endpush
+

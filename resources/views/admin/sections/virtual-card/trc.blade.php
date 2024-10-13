@@ -52,7 +52,7 @@
 
     <div class="form-group">
         <label for="amount">{{ __("Amount") }}</label>
-        <input type="number" name="amount" id="amount" class="form--control" required>
+        <input type="text" name="amount" id="amount" class="form--control" pattern="^\d*(\.\d{0,2})?$" required>
     </div>
     <div class="form-group">
         <label for="currency">{{ __("Currency") }}</label>

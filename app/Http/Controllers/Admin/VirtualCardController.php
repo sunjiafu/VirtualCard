@@ -87,13 +87,43 @@ class VirtualCardController extends Controller
         ));
     }
 
-    public function show(){
-
-        $cards = VirtualCard::all();
-
-        return view('admin.sections.virtual-card.show',compact('cards'));
+    public function show()
+    {
+        $cards = VirtualCard::with('user')->orderBy('created_at', 'desc')->paginate(15);
+        $search = '';
+        $start_date = '';
+        $end_date = '';
+        return view('admin.sections.virtual-card.show', compact('cards', 'search', 'start_date', 'end_date'));
     }
 
+    public function search(Request $request)
+    {
+        $search = $request->input('search', '');
+        $start_date = $request->input('start_date');
+        $end_date = $request->input('end_date');
+
+        $query = VirtualCard::with('user')->orderBy('created_at', 'desc');
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('user', function ($userQuery) use ($search) {
+                    $userQuery->where('username', 'like', "%{$search}%");
+                })->orWhere('card_pan', 'like', "%{$search}%");
+            });
+        }
+
+        if ($start_date) {
+            $query->whereDate('created_at', '>=', $start_date);
+        }
+
+        if ($end_date) {
+            $query->whereDate('created_at', '<=', $end_date);
+        }
+
+        $cards = $query->paginate(15);
+
+        return view('admin.sections.virtual-card.show', compact('cards', 'search', 'start_date', 'end_date'));
+    }
 
     public function editcard($id){
 
@@ -191,3 +221,4 @@ class VirtualCardController extends Controller
        
 
 }
+
