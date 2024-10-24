@@ -33,7 +33,11 @@
                                 </div>
                                 <div class="dashboard-list-user-content">
                                     <h4 class="title">{{ __("Payment Details") }}: {{ $transaction->product }}</h4>
+                                    @if($transaction->status == 'success')
                                     <span class="sub-title text--danger"> <span class="badge badge--success ms-2">{{ $transaction->status }}</span></span>
+                                    @else
+                                    <span class="sub-title text--danger"> <span class="badge badge--danger ms-2">{{ $transaction->status }}</span></span>
+                                    @endif
                                 </div>
                             </div>
                         </div>
