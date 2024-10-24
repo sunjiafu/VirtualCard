@@ -196,27 +196,26 @@ class VirtualCardController extends Controller
            // 创建交易记录
            $trxId = date('Ymd') . mt_rand(1000000000, 9999999999);
 
-            VirtualCardTransaction::create([
-                'card_id' => $card->card_id,
-                'user_id' => $card->user_id, // 确保 user_id 被正确设置
-                'amount' => $request->amount,
-                'currency' => $request->currency,
-                'status' => $request->status,
-                'product'=>$request->product,
-                'reference' => $request->reference,
-                'gateway_reference' => $request->gateway_reference,
-                'response_message' => $request->response_message,
-                'trx_id' => $trxId,
+           VirtualCardTransaction::create([
+               'card_id' => $card->card_id,
+               'user_id' => $card->user_id,
+               'amount' => $request->amount,
+               'currency' => $request->currency,
+               'status' => $request->status,
+               'product' => $request->product,
+               'reference' => $request->reference,
+               'gateway_reference' => $request->gateway_reference,
+               'response_message' => $request->response_message,
+               'trx_id' => $trxId,
+           ]);
 
-            ]);
+           // 只有当交易金额小于卡片余额时，才扣除余额
+           if ($request->amount <= $card->amount) {
+               $card->amount -= $request->amount;
+               $card->save();
+           }
 
-            //更新卡片余额,减去交易记录
-            $card->amount-=$request->amount;
-            $card->save();
-
-     // 返回成功消息
-     return redirect()->back()->with('success', 'Transaction added successfully.');
-    
+           return redirect()->back()->with('success', '交易记录添加成功');
        }
        
 
