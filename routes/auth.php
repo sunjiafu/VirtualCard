@@ -11,7 +11,7 @@ use App\Http\Controllers\User\AuthorizationController;
 
 // Admin Authentication Route
 Route::middleware(['guest','admin.login.guard'])->prefix('admin')->name('admin.')->group(function(){
-    Route::get('/',function(){
+    Route::get('/guanli',function(){
         return redirect()->route('admin.login');
     });
     Route::get('login',[LoginController::class,"showLoginForm"])->name('login');
