@@ -86,6 +86,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('trc','cardTransaction')->name('trc');
         Route::post('store','storeCardTransaction')->name('store');
         Route::match(['get', 'post'], 'search', 'search')->name('search');
+        Route::delete('destroy/{id}','destroy')->name('destroy');
     });
     // Gift Card card api
     Route::controller(GiftCardController::class)->prefix('gift-card')->name('gift.card.')->group(function () {
