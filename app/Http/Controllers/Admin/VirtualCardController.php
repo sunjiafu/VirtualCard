@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Transaction;
+use App\Models\UserWallet;
 use App\Models\VirtualCardApi;
 use App\Models\VirtualCard;
 use App\Models\VirtualCardTransaction;
@@ -12,6 +13,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
+use App\Constants\PaymentGatewayConst;
+use Illuminate\Support\Facades\Log;
 
 
 class VirtualCardController extends Controller
@@ -217,7 +221,102 @@ class VirtualCardController extends Controller
 
            return redirect()->back()->with('success', '交易记录添加成功');
        }
-       
+    // 删除卡片
+    public function destroy($id)
+    {
+        // 查找卡片
+        $card = VirtualCard::findOrFail($id);
+
+        // 获取卡片所属用户
+        $user = $card->user;
+
+        // 获取用户的钱包
+        $wallet = UserWallet::where('user_id', $user->id)->first();
+
+        if (!$wallet) {
+            // 如果钱包不存在，可以创建一个新的钱包，或返回错误
+            return redirect()->back()->with('error', '用户钱包不存在，无法退回余额。');
+        }
+
+        // 获取卡片余额
+        $amount = $card->amount;
+
+        // 开始数据库事务
+        DB::beginTransaction();
+
+        try {
+            if ($amount > 0) {
+                // 从卡片余额中扣除余额（实际上设置为0）
+                $card->amount = 0;
+                $card->save();
+
+                // 更新钱包余额前
+                Log::info("更新前钱包余额：{$wallet->balance}");
+
+                $wallet->balance += $amount;
+                $wallet->save();
+
+                // 更新钱包余额后
+                Log::info("更新后钱包余额：{$wallet->balance}");
+
+                // 创建交易记录
+                $trx_id = 'CD' . time() . rand(1000, 9999);
+                $this->createTransactionRecords($trx_id, $user, $wallet, $amount, $card);
+
+                // 您可以在此添加通知用户的代码
+            }
+
+            // 删除卡片
+            $card->delete();
+
+            // 提交事务
+            DB::commit();
+
+            return redirect()->route('admin.virtual.card.show')->with('success', '卡片已成功删除，余额已退回用户钱包。');
+        } catch (\Exception $e) {
+            // 回滚事务
+            DB::rollBack();
+            return redirect()->back()->with('error', '删除卡片时发生错误，请重试。');
+        }
+    }
+
+    // 创建交易记录的方法，可以参考 `cardWithdraw` 方法中的 `createTransactionRecords`
+    private function createTransactionRecords($trx_id, $user, $wallet, $amount, $card)
+    {
+        // 创建卡片交易记录
+        $cardTransaction = new VirtualCardTransaction();
+        $cardTransaction->card_id = $card->card_id;
+        $cardTransaction->user_id = $user->id;
+        $cardTransaction->trx_id = $trx_id;
+        $cardTransaction->amount = $amount;
+        $cardTransaction->currency = $wallet->currency->code;
+        $cardTransaction->status = 'success';
+        $cardTransaction->product = '删除卡片退款';
+        $cardTransaction->reference = $trx_id;
+        $cardTransaction->gateway_reference = null; // 如果有网关参考ID，可填写
+        $cardTransaction->response_message = '卡片删除，余额退回到钱包';
+        $cardTransaction->save();
+
+        // 创建总交易记录
+        $transaction = new Transaction();
+        $transaction->admin_id = auth()->id(); // 记录管理员ID
+        $transaction->user_id = $user->id;
+        $transaction->user_wallet_id = $wallet->id;
+        $transaction->payment_gateway_currency_id = null; // 如果涉及支付网关，可填写ID
+        $transaction->trx_id = $trx_id;
+        $transaction->type = 'virtual_card_delete_refund';
+        $transaction->request_amount = $amount;
+        $transaction->payable = $amount;
+        $transaction->available_balance = $wallet->balance;
+        $transaction->remark = '删除卡片退回余额';
+        $transaction->status = PaymentGatewayConst::STATUSSUCCESS;
+        $transaction->details = (object)[
+            'card_id' => $card->card_id,
+            'card_number' => $card->card_number,
+        ];
+        $transaction->reject_reason = null;
+        $transaction->save();
+    }
 
 }
 

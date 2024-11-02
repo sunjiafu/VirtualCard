@@ -90,6 +90,12 @@
                                 <a href="{{ route('admin.virtual.card.editcard', $card->id) }}" class="btn btn-sm btn-primary">
                                     <i class="fas fa-edit"></i> {{ __("编辑") }}
                                 </a>
+
+                                <form action="{{ route('admin.virtual.card.destroy', $card->id) }}" method="POST" style="display:inline;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger" onclick="return confirm('确定要删除这张卡吗？')">删除</button>
+                                </form>
                             </td>
                         </tr>
                     @empty
