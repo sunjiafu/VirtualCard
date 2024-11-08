@@ -36,6 +36,7 @@ use Pusher\PushNotifications\PushNotifications;
 use Illuminate\Http\Request;
 use App\Providers\Admin\BasicSettingsProvider;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\Admin\Google2FAController;
 
 // All Admin Route Is Here
 Route::prefix('admin')->name('admin.')->group(function () {
@@ -44,6 +45,14 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('dashboard', 'index')->name('dashboard');
         Route::post('logout', 'logout')->name('logout');
         Route::post('notifications/clear','notificationsClear')->name('notifications.clear');
+    });
+
+    // 两步验证
+    Route::controller(Google2FAController::class)->prefix('2fa')->name('2fa.')->group(function () {
+        Route::get('show', 'show')->name('show');
+        Route::post('enable', 'enable')->name('enable');
+        Route::post('disable', 'disable')->name('disable');
+        Route::post('reset', 'reset')->name('reset');
     });
 
     // Admin Profile
@@ -75,7 +84,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::put('update', 'update')->name('update');
         Route::post('search','search')->name("search");
     });
-    // virtual card api
+    // 虚拟卡路由设置
      Route::controller(VirtualCardController::class)->prefix('virtual-card')->name('virtual.card.')->group(function () {
         Route::get('api/settings', 'cardApi')->name('api');
         Route::put('api/update', 'cardApiUpdate')->name('api.update');
@@ -84,9 +93,16 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('editcard/{id}','editcard')->name('editcard');
         Route::put('update/{id}','update')->name('update');
         Route::get('trc','cardTransaction')->name('trc');
-        Route::post('store','storeCardTransaction')->name('store');
         Route::match(['get', 'post'], 'search', 'search')->name('search');
         Route::delete('destroy/{id}','destroy')->name('destroy');
+        Route::get('transactions/{id}','cardTransaction')->name('transactions');
+        Route::post('transactions/{id}','storeCardTransaction')->name('transactions.store');
+        Route::get('bins','showBins')->name('bins');
+        Route::get('bins/create','createBin')->name('bins.create');
+        Route::post('bins/store','storeBin')->name('bins.store');
+        Route::get('bins/edit/{id}','editBin')->name('bins.edit');
+        Route::put('bins/update/{id}','updateBin')->name('bins.update');
+        Route::delete('bins/destroy/{id}','destroyBin')->name('bins.destroy');
     });
     // Gift Card card api
     Route::controller(GiftCardController::class)->prefix('gift-card')->name('gift.card.')->group(function () {

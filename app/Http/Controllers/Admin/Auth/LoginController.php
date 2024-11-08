@@ -14,10 +14,12 @@ use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Jenssegers\Agent\Agent;
+use Illuminate\Foundation\Auth\ThrottlesLogins;
+
 
 class LoginController extends Controller
 {
-    use AuthenticatesUsers;
+    use AuthenticatesUsers, ThrottlesLogins;
 
     /**
      * Display The Amdin Login From Page
@@ -25,7 +27,8 @@ class LoginController extends Controller
      * @return view
      */
     public function showLoginForm() {
-        return view('admin.auth.login');
+        $user = null;
+        return view('admin.auth.login',compact('user') );
     }
 
 
@@ -40,10 +43,29 @@ class LoginController extends Controller
      */
     protected function validateLogin(Request $request)
     {
-        $request->validate([
-            'email'                => 'required|string',
-            'password'             => 'required|string',
-        ]);
+        $rules = [
+            'email'    => 'required|string',
+            'password' => 'required|string',
+            'captcha'  => 'required|captcha',
+        ];
+
+        $messages = [
+            'email.required'    => '请输入邮箱',
+            'password.required' => '请输入密码',
+            'captcha.required'  => '请填写验证码',
+            'captcha.captcha'   => '验证码错误，请重新输入',
+        ];
+
+        // 获取用户信息
+        $user = \App\Models\Admin\Admin::where('email', $request->email)->first();
+
+        // 如果用户启用了两步验证，则要求验证码
+        if ($user && $user->google2fa_enabled) {
+            $rules['google2fa_code'] = 'required|string';
+            $messages['google2fa_code.required'] = '请输入谷歌验证码';
+        }
+
+        $request->validate($rules, $messages);
     }
 
     /**
@@ -149,5 +171,31 @@ class LoginController extends Controller
     {
         $request->merge(['status' => true]);
         return $request->only($this->username(), 'password','status');
+    }
+
+    protected function attemptLogin(Request $request)
+    {
+        $credentials = $this->credentials($request);
+        $user = $this->guard()->getProvider()->retrieveByCredentials($credentials);
+
+        if ($user) {
+            // 如果用户启用了两步验证，验证谷歌验证码
+            if ($user->google2fa_enabled) {
+                $google2fa = app('pragmarx.google2fa');
+                $valid = $google2fa->verifyKey($user->google2fa_secret, $request->google2fa_code);
+
+                if (!$valid) {
+                    throw ValidationException::withMessages([
+                        'google2fa_code' => ['谷歌验证码不正确'],
+                    ]);
+                }
+            }
+
+            return $this->guard()->attempt(
+                $this->credentials($request), $request->filled('remember')
+            );
+        }
+
+        return false;
     }
 }

@@ -128,6 +128,10 @@
                                         'title' =>("交易记录"),
                                         'route' =>"admin.virtual.card.trc"
                                 ],
+                                [
+                                    'title' =>("卡段管理"),
+                                    'route' =>"admin.virtual.card.bins"
+                                ],
                                 ],
                               
                                 
@@ -496,6 +500,11 @@
                     'route'     => 'admin.cache.clear',
                     'title'     => __("Clear Cache"),
                     'icon'      => "menu-icon las la-broom",
+                ])
+                @include('admin.components.side-nav.link',[
+                    'route'     => 'admin.2fa.show',
+                    'title'     => __("Two-Factor Authentication"),
+                    'icon'      => "menu-icon las la-lock",
                 ])
             </ul>
         </div>
