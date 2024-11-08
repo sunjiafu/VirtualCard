@@ -33,9 +33,9 @@
               <li class="nav-item">
                 <a href="{{ setRoute('user.transfer.money.index') }}" class="nav-link">转账</a>
               </li>
-              <li class="nav-item">
+              {{-- <li class="nav-item">
                 <a href="withdraw.html" class="nav-link">提现</a>
-              </li>
+              </li> --}}
             </ul>
           </div>
         </li>
