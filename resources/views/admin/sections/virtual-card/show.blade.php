@@ -64,8 +64,9 @@
                     <tr>
                         <th>{{ __("ID") }}</th>
                         <th>{{ __("用户") }}</th>
-                        <th>{{ __("金额") }}</th>
-                        <th>{{ __("卡号前缀") }}</th>
+                        <th>{{ __("卡号") }}</th>
+                        <th>{{ __("余额") }}</th>
+                        <th>{{ __("卡段") }}</th>
                         <th>{{ __("状态") }}</th>
                         <th>{{ __("创建时间") }}</th>
                         <th>{{ __("操作") }}</th>
@@ -76,6 +77,7 @@
                         <tr>
                             <td>{{ $card->id }}</td>
                             <td>{{ $card->user->username }}</td>
+                            <td>{{ $card->card_pan }}</td>
                             <td>{{ $card->amount }}</td>
                             <td>{{ $card->card_bin }}</td>
                             <td>
@@ -96,6 +98,8 @@
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-danger" onclick="return confirm('确定要删除这张卡吗？')">删除</button>
                                 </form>
+
+                                <a href="{{ route('admin.virtual.card.transactions', $card->id) }}" class="btn btn-primary">交易记录</a>
                             </td>
                         </tr>
                     @empty

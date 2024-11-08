@@ -17,7 +17,7 @@
                         <li><img src="{{ $item->userImage }}" alt="user"></li>
                     </ul>
                 </td>
-                <td><span>{{ $item->fullname }}</span></td>
+                <td><span>{{ $item->username }}</span></td>
                 <td>{{ $item->email }}</td>
                 <td>
                     <span class="{{ $item->emailStatus->class }}">{{ __($item->emailStatus->value) }}</span>

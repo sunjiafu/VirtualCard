@@ -10,7 +10,7 @@
             ['name' => __("Dashboard"), 'url' => setRoute("admin.dashboard")],
             ['name' => __("Virtual Card Transactions"), 'url' => '#'],
         ],
-        'active' => __("Find Virtual Card")
+        'active' => __("Card Transactions")
     ])
 @endsection
 
@@ -24,18 +24,6 @@
     
     <div class="dashboard-list-area mt-20">
         <div class="dashboard-list-wrapper">
-            <!-- 搜索卡号表单 -->
-            <form action="{{ route('admin.virtual.card.trc') }}" method="GET" class="card-form row g-4 mb-4">
-                <div class="col-12">
-                    <div class="form-group">
-                        <label for="card_pan">{{ __("Card Number") }}</label>
-                        <input type="text" name="card_pan" id="card_pan" class="form--control" placeholder="{{ __("Enter Card Number") }}" required>
-                    </div>
-                </div>
-                <div class="col-12">
-                    <button type="submit" class="btn--base w-100">{{ __("Find Card") }}</button>
-                </div>
-            </form>
 
             @if(isset($card))
             <div class="card-wrapper p-4">
@@ -43,44 +31,60 @@
                 <p><strong>{{ __("Card Number:") }}</strong> {{ $card->card_pan }}</p>
                 <p><strong>{{ __("Card Holder:") }}</strong> {{ $card->card_holder }}</p>
                 <p><strong>{{ __("Expiration:") }}</strong> {{ date('m/Y', strtotime($card->expiration)) }}</p>
+                <!-- 显示卡片余额 -->
+                <p><strong>{{ __("Balance:") }}</strong> {{ $card->amount }}</p>
 
-                <form action="{{ route('admin.virtual.card.store') }}" method="POST" class="mt-4">
-    @csrf
-    <input type="hidden" name="card_id" value="{{ $card->id }}">
+                <!-- 添加交易记录的表单 -->
+                <form action="{{ route('admin.virtual.card.transactions.store', $card->id) }}" method="POST" class="mt-4">
+                    @csrf
+                    <input type="hidden" name="card_id" value="{{ $card->id }}">
 
-    <h4 class="text--base mb-3">{{ __("Add Transaction") }}</h4>
+                    <h4 class="text--base mb-3">{{ __("Add Transaction") }}</h4>
 
-    <div class="form-group">
-        <label for="amount">{{ __("Amount") }}</label>
-        <input type="text" name="amount" id="amount" class="form--control" pattern="^\d*(\.\d{0,2})?$" required>
-    </div>
-    <div class="form-group">
-        <label for="currency">{{ __("Currency") }}</label>
-        <input type="text" name="currency" id="currency" class="form--control" required>
-    </div>
-    <div class="form-group">
-        <label for="status">{{ __("Status") }}</label>
-        <input type="text" name="status" id="status" class="form--control" required>
-    </div>
-    <div class="form-group">
-        <label for="product">{{ __("Product (optional)") }}</label>
-        <input type="text" name="product" id="product" class="form--control">
-    </div>
-    <div class="form-group">
-        <label for="reference">{{ __("Reference (optional)") }}</label>
-        <input type="text" name="reference" id="reference" class="form--control">
-    </div>
-    <div class="form-group">
-        <label for="gateway_reference">{{ __("Gateway Reference (optional)") }}</label>
-        <input type="text" name="gateway_reference" id="gateway_reference" class="form--control">
-    </div>
-    <div class="form-group">
-        <label for="response_message">{{ __("Response Message (optional)") }}</label>
-        <input type="text" name="response_message" id="response_message" class="form--control">
-    </div>
+                    <div class="form-group">
+                        <label for="amount">{{ __("Amount") }}</label>
+                        <input type="text" name="amount" id="amount" class="form--control" pattern="^\d*(\.\d{0,2})?$" required>
+                    </div>
+                    <!-- 新增类型字段 -->
+                    <div class="form-group">
+                        <label for="type">{{ __("Type") }}</label>
+                        <select name="type" id="type" class="form--control" required>
+                            <option value="{{ \App\Constants\PaymentGatewayConst::TYPECONSUMPTION }}">{{ __("消费支出") }}</option>
+                            <option value="{{ \App\Constants\PaymentGatewayConst::TYPEREFUND }}">{{ __("退款") }}</option>
+                        </select>
+                    </div>
+                    <!-- 修改状态字段，提供预设的常量值 -->
+                    <div class="form-group">
+                        <label for="status">{{ __("Status") }}</label>
+                        <select name="status" id="status" class="form--control" required>
+                            <option value="{{ \App\Constants\PaymentGatewayConst::STATUSSUCCESS }}">{{ __("Success") }}</option>
+                            <option value="{{ \App\Constants\PaymentGatewayConst::STATUSPENDING }}">{{ __("Pending") }}</option>
+                            <option value="{{ \App\Constants\PaymentGatewayConst::STATUSFAILED }}">{{ __("Failed") }}</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="currency">{{ __("Currency") }}</label>
+                        <input type="text" name="currency" id="currency" class="form--control" value="{{ get_default_currency_code() }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="product">{{ __("Product") }} ({{ __("optional") }})</label>
+                        <input type="text" name="product" id="product" class="form--control">
+                    </div>
+                    <div class="form-group">
+                        <label for="reference">{{ __("Reference") }} ({{ __("optional") }})</label>
+                        <input type="text" name="reference" id="reference" class="form--control">
+                    </div>
+                    <div class="form-group">
+                        <label for="gateway_reference">{{ __("Gateway Reference") }} ({{ __("optional") }})</label>
+                        <input type="text" name="gateway_reference" id="gateway_reference" class="form--control">
+                    </div>
+                    <div class="form-group">
+                        <label for="response_message">{{ __("Response Message") }} ({{ __("optional") }})</label>
+                        <input type="text" name="response_message" id="response_message" class="form--control">
+                    </div>
 
-    <button type="submit" class="btn--base w-100">{{ __("Add Transaction") }}</button>
-</form>
+                    <button type="submit" class="btn--base w-100">{{ __("Add Transaction") }}</button>
+                </form>
 
             </div>
 
@@ -90,6 +94,7 @@
                     <thead>
                         <tr>
                             <th>{{ __("ID") }}</th>
+                            <th>{{ __("Type") }}</th>
                             <th>{{ __("Amount") }}</th>
                             <th>{{ __("Currency") }}</th>
                             <th>{{ __("Status") }}</th>
@@ -104,6 +109,7 @@
                         @foreach ($transactions as $transaction)
                         <tr>
                             <td>{{ $transaction->id }}</td>
+                            <td>{{ $transaction->type }}</td>
                             <td>{{ $transaction->amount }}</td>
                             <td>{{ $transaction->currency }}</td>
                             <td>{{ $transaction->status }}</td>

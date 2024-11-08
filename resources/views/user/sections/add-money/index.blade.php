@@ -1,346 +1,240 @@
-@extends('user.layouts.master')
-
-@push('css')
-
-@endpush
+@extends('user.layouts.maste-new')
 
 @section('breadcrumb')
-@include('user.components.breadcrumb', [
-    'breadcrumbs' => [
+    @include('user.components.breadcrumb',['breadcrumbs' => [
         [
-            'name' => __("Dashboard"),
-            'url' => setRoute("user.dashboard"),
+            'name'  => __("Dashboard"),
+            'url'   => setRoute("user.dashboard"),
         ]
-    ],
-    'active' => __(@$page_title)
-])
+    ], 'active' => __("Add Money")])
 @endsection
 
 @section('content')
+<div class="px-3 px-xxl-5 py-3 py-lg-4 border-bottom border-gray-200 after-header">
+    <div class="container-fluid px-0">
+        <div class="row align-items-center">
+            <div class="col">
+                <h1 class="h2 mb-0">{{ __("Add Money") }}</h1>
+            </div>
+        </div>
+    </div>
+</div>
 
-<div class="body-wrapper">
-    <div class="deposit-wrapper ptb-50">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-lg-6 col-md-8 pb-30">
-                    <div class="deposit-form">
-                        <div class="form-title text-center">
-                            <h3 class="title">{{ __($page_title) }}</h3>
-                        </div>
-                        <div class="row justify-content-center">
-                            <form class="card-form" action="{{ setRoute("user.add.money.submit") }}" method="POST">
-                                @csrf
-                                <div class="col-lg-12">
-                                    <div class="form-group">
-                                        <label>{{ __("Payment Gateway") }}<span>*</span></label>
-                                        <div class="method ">
-
-                                            <select class="form--control nice-select gateway-select" name="currency">
-                                                @foreach ($payment_gateways_currencies ?? [] as $item)
-
-                                                    <option value="{{ $item->alias  }}"
-                                                        data-currency="{{ $item->currency_code }}"
-                                                        data-min_amount="{{ $item->min_limit }}"
-                                                        data-max_amount="{{ $item->max_limit }}"
-                                                        data-percent_charge="{{ $item->percent_charge }}"
-                                                        data-fixed_charge="{{ $item->fixed_charge }}"
-                                                        data-rate="{{ $item->rate }}"
-                                                        data-crypto="{{ $item->gateway->crypto }}">
-
-                                                        @if($item->alias === 'add-money-epusdt-usd-automatic')
-
-                                                            Usdt-Trc20
-
-                                                        @else
-
-                                                            {{ $item->name }}
-
-
-                                                        @endif
-
-                                                    </option>
-
-                                                @endforeach
-                                            </select>
-                                        </div>
-
-                                    </div>
-                                    <div class="form-group">
-                                        <label>{{ __("Enter Amount") }}<span>*</span></label>
-                                        <input type="number" required class="form--control"
-                                            placeholder="{{ __("Enter Amount") }}" name="amount"
-                                            value="{{ old("amount") }}">
-                                        <div class="currency">
-                                            <p>{{ get_default_currency_code() }}</p>
-                                        </div>
-                                    </div>
-                                    <div class="note-area d-flex justify-content-between">
-                                        <div class="d-block limit-show">--</div>
-                                        <div class="d-block fees-show">--</div>
-                                    </div>
-                                    <div class="button pt-3">
-                                        <button type="submit"
-                                            class="btn--base w-100 btn-loading sendBtn">{{ __("Confirm") }}</i></button>
-                                    </div>
+<div class="p-3 p-xxl-5">
+    <div class="container-fluid px-0">
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <div class="card rounded-12 shadow-dark-80 h-100">
+                    <div class="card-body p-4 d-flex flex-column">
+                        <h5 class="card-title mb-4">{{ __($page_title) }}</h5>
+                        <form class="row g-4 flex-grow-1" action="{{ setRoute("user.add.money.submit") }}" method="POST" novalidate>
+                            @csrf
+                            <div class="col-md-12">
+                                <label class="form-label">{{ __("支付网关") }}<span class="text-danger">*</span></label>
+                                <select class="form-select" name="currency" required>
+                                    <option selected disabled value="">{{ __("选择支付网关") }}</option>
+                                    @foreach ($payment_gateways_currencies ?? [] as $item)
+                                        <option value="{{ $item->alias }}"
+                                            data-currency="{{ $item->currency_code }}"
+                                            data-min_amount="{{ $item->min_limit }}"
+                                            data-max_amount="{{ $item->max_limit }}"
+                                            data-percent_charge="{{ $item->percent_charge }}"
+                                            data-fixed_charge="{{ $item->fixed_charge }}"
+                                            data-rate="{{ $item->rate }}"
+                                            data-crypto="{{ $item->gateway->crypto }}">
+                                            {{ $item->alias === 'add-money-epusdt-usd-automatic' ? 'Usdt-Trc20' : $item->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label">{{ __("输入金额") }}<span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" placeholder="{{ __("输入金额") }}" name="amount" value="{{ old("amount") }}" required>
+                                    <span class="input-group-text">{{ get_default_currency_code() }}</span>
                                 </div>
-                            </form>
-                        </div>
+                            </div>
+                            <div class="col-12 d-flex justify-content-between">
+                                <small class="text-muted limit-show">--</small>
+                                <small class="text-muted fees-show">--</small>
+                            </div>
+                            <div class="col-12 mt-auto">
+                                <button type="submit" class="btn btn-primary w-100">{{ __("确认") }}</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
-                <div class="col-lg-6 col-md-8">
-                    <div class="deposit-form">
-                        <div class="form-title text-center pb-4">
-                            <h3 class="title">{{ __($page_title) }} {{ __("preview") }}</h3>
+            </div>
+            <div class="col-lg-6">
+                <div class="card rounded-12 shadow-dark-80 h-100">
+                    <div class="card-body p-4 d-flex flex-column">
+                        <h5 class="card-title mb-4">{{ __($page_title) }} {{ __("预览") }}</h5>
+                        <ul class="list-group list-group-flush flex-grow-1">
+                            <li class="list-group-item d-flex justify-content-between align-items-center py-3">
+                                {{ __("输入金额") }}
+                                <span class="request-amount">--</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center py-3">
+                                {{ __("Exchange Rate") }}
+                                <span class="rate-show">--</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center py-3">
+                                {{__("Fees & Charges")}}
+                                <span class="fees">--</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center py-3">
+                                {{__("Conversion Amount")}}
+                                <span class="conversionAmount">--</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center py-3">
+                                {{__("Will Get")}}
+                                <span class="will-get">--</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center py-3">
+                                {{ __("Total Payable Amount") }}
+                                <span class="pay-in-total">--</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card rounded-12 shadow-dark-80">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h5 class="card-title mb-0">{{ __("充值记录") }}</h5>
+                            <a href="{{ setRoute('user.transactions.index', 'add-money') }}" class="btn btn-sm btn-primary">{{__("查看更多")}}</a>
                         </div>
-                        <div class="preview-item d-flex justify-content-between">
-                            <div class="preview-content">
-                                <p>{{ __("Enter Amount") }}</p>
-                            </div>
-                            <div class="preview-content">
-                                <p class="request-amount"> </p>
-                            </div>
-                        </div>
-
-                        <div class="preview-item d-flex justify-content-between">
-                            <div class="preview-content">
-                                <p>{{ __("Exchange Rate") }}</p>
-                            </div>
-                            <div class="preview-content">
-                                <p class="rate-show">--</p>
-                            </div>
-                        </div>
-                        <div class="preview-item d-flex justify-content-between">
-                            <div class="preview-content">
-                                <p>{{__("Fees & Charges")}}</p>
-                            </div>
-                            <div class="preview-content">
-                                <p class="fees">--</p>
-                            </div>
-                        </div>
-                        <div class="preview-item d-flex justify-content-between">
-                            <div class="preview-content">
-                                <p>{{__("Conversion Amount")}}</p>
-                            </div>
-                            <div class="preview-content">
-                                <p class="conversionAmount">--</p>
-                            </div>
-                        </div>
-                        <div class="preview-item d-flex justify-content-between">
-                            <div class="preview-content">
-                                <p>{{__("Will Get")}}</p>
-                            </div>
-                            <div class="preview-content">
-                                <p class="will-get">--</p>
-                            </div>
-                        </div>
-
-                        <div class="preview-item d-flex justify-content-between">
-                            <div class="preview-content">
-                                <p>{{ __("Total Payable Amount") }}</p>
-                            </div>
-                            <div class="preview-content">
-                                <p class="pay-in-total">--</p>
-                            </div>
-                        </div>
-
+                        @include('user.components.transaction-log', compact("transactions"))
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="dashboard-list-area mt-20">
-        <div class="dashboard-header-wrapper">
-            <h4 class="title">{{ __("Add Money Log") }}</h4>
-            <div class="dashboard-btn-wrapper">
-                <div class="dashboard-btn mb-2">
-                    <a href="{{ setRoute('user.transactions.index', 'add-money') }}"
-                        class="btn--base">{{__("View More")}}</a>
-                </div>
-            </div>
-        </div>
-        <div class="dashboard-list-wrapper">
-            @include('user.components.transaction-log', compact("transactions"))
-        </div>
-    </div>
-
+    @include('user.partials.footer')
 </div>
 @endsection
 
 @push('script')
-    <script>
+<script>
+    $(document).ready(function() {
         var defualCurrency = "{{ get_default_currency_code() }}";
         var defualCurrencyRate = "{{ get_default_currency_rate() }}";
-        var presion = 4;
+        var precision = 4;
 
-        $('select[name=currency]').on('change', function () {
-            if (acceptVar().cryptoType == 1) {
-                presion = 8;
-            } else {
-                presion = 4;
-            }
-            getExchangeRate($(this));
-            getLimit();
-            getFees();
-            getPreview();
-        });
-        $(document).ready(function () {
-            if (acceptVar().cryptoType == 1) {
-                presion = 8;
-            } else {
-                presion = 4;
-            }
+        function acceptVar() {
+            var selectedVal = $("select[name=currency] :selected");
+            return {
+                currencyCode: selectedVal.data('currency'),
+                currencyRate: selectedVal.data('rate'),
+                cryptoType: selectedVal.data('crypto'),
+                currencyMinAmount: selectedVal.data('min_amount'),
+                currencyMaxAmount: selectedVal.data('max_amount'),
+                currencyFixedCharge: selectedVal.data('fixed_charge'),
+                currencyPercentCharge: selectedVal.data('percent_charge'),
+                selectedVal: selectedVal,
+            };
+        }
+
+        function updateAll() {
+            var vars = acceptVar();
+            precision = vars.cryptoType == 1 ? 8 : 4;
             getExchangeRate();
             getLimit();
             getFees();
             getPreview();
-        });
-        $("input[name=amount]").keyup(function () {
+        }
+
+        $('select[name=currency]').on('change', updateAll);
+        $("input[name=amount]").on('input', function() {
             getFees();
             getPreview();
-        });
-        $("input[name=amount]").focusout(function () {
-            enterLimit();
-        });
-        function getExchangeRate(event) {
-            var element = event;
-            var currencyCode = acceptVar().currencyCode;
-            var currencyRate = acceptVar().currencyRate;
-            var currencyMinAmount = acceptVar().currencyMinAmount;
-            var currencyMaxAmount = acceptVar().currencyMaxAmount;
-            $('.rate-show').html("1 " + defualCurrency + " = " + parseFloat(currencyRate).toFixed(presion) + " " + currencyCode);
+        }).on('blur', enterLimit);
+
+        function getExchangeRate() {
+            var vars = acceptVar();
+            $('.rate-show').text("1 " + defualCurrency + " = " + parseFloat(vars.currencyRate).toFixed(precision) + " " + vars.currencyCode);
         }
+
         function getLimit() {
-            var sender_currency = acceptVar().currencyCode;
-            var sender_currency_rate = acceptVar().currencyRate;
-            var min_limit = acceptVar().currencyMinAmount;
-            var max_limit = acceptVar().currencyMaxAmount;
-            if ($.isNumeric(min_limit) || $.isNumeric(max_limit)) {
-                var min_limit_calc = parseFloat(min_limit / sender_currency_rate).toFixed(4);
-                var max_limit_clac = parseFloat(max_limit / sender_currency_rate).toFixed(4);
-                $('.limit-show').html("{{ __('Limit') }} " + min_limit_calc + " " + defualCurrency + " - " + max_limit_clac + " " + defualCurrency);
-                return {
-                    minLimit: min_limit_calc,
-                    maxLimit: max_limit_clac,
-                };
+            var vars = acceptVar();
+            if ($.isNumeric(vars.currencyMinAmount) && $.isNumeric(vars.currencyMaxAmount)) {
+                var minLimit = parseFloat(vars.currencyMinAmount / vars.currencyRate).toFixed(4);
+                var maxLimit = parseFloat(vars.currencyMaxAmount / vars.currencyRate).toFixed(4);
+                $('.limit-show').text("{{ __('Limit') }} " + minLimit + " " + defualCurrency + " - " + maxLimit + " " + defualCurrency);
+                return { minLimit: minLimit, maxLimit: maxLimit };
             } else {
-                $('.limit-show').html("--");
-                return {
-                    minLimit: 0,
-                    maxLimit: 0,
-                };
+                $('.limit-show').text("--");
+                return { minLimit: 0, maxLimit: 0 };
             }
         }
+
         function enterLimit() {
-            var sender_currency_rate = acceptVar().currencyRate;
-            var min_limit = acceptVar().currencyMinAmount;
-            var max_limit = acceptVar().currencyMaxAmount;
-            if ($.isNumeric(min_limit) || $.isNumeric(max_limit)) {
-                var min_limit_calc = parseFloat(min_limit / sender_currency_rate).toFixed(presion);
-                var max_limit_clac = parseFloat(max_limit / sender_currency_rate).toFixed(presion);
+            var vars = acceptVar();
+            var limits = getLimit();
+            var amount = parseFloat($("input[name=amount]").val());
 
-            }
-            var sender_amount = parseFloat($("input[name=amount]").val());
-
-            if (sender_amount < min_limit_calc) {
-                throwMessage('error', ["{{ __('Please follow the mimimum limit') }}"]);
-                $('.sendBtn').attr('disabled', true)
-            } else if (sender_amount > max_limit_clac) {
+            if (amount < limits.minLimit) {
+                throwMessage('error', ["{{ __('Please follow the minimum limit') }}"]);
+                $('.sendBtn').prop('disabled', true);
+            } else if (amount > limits.maxLimit) {
                 throwMessage('error', ["{{ __('Please follow the maximum limit') }}"]);
-                $('.sendBtn').attr('disabled', true)
+                $('.sendBtn').prop('disabled', true);
             } else {
-                $('.sendBtn').attr('disabled', false)
+                $('.sendBtn').prop('disabled', false);
             }
-
-        }
-
-
-        function acceptVar() {
-            var selectedVal = $("select[name=currency] :selected");
-            var currencyCode = $("select[name=currency] :selected").attr("data-currency");
-            var currencyRate = $("select[name=currency] :selected").attr("data-rate");
-            var cryptoType = $("select[name=currency] :selected").attr("data-crypto");
-            var currencyMinAmount = $("select[name=currency] :selected").attr("data-min_amount");
-            var currencyMaxAmount = $("select[name=currency] :selected").attr("data-max_amount");
-            var currencyFixedCharge = $("select[name=currency] :selected").attr("data-fixed_charge");
-            var currencyPercentCharge = $("select[name=currency] :selected").attr("data-percent_charge");
-
-            return {
-                currencyCode: currencyCode,
-                currencyRate: currencyRate,
-                cryptoType: cryptoType,
-                currencyMinAmount: currencyMinAmount,
-                currencyMaxAmount: currencyMaxAmount,
-                currencyFixedCharge: currencyFixedCharge,
-                currencyPercentCharge: currencyPercentCharge,
-                selectedVal: selectedVal,
-
-            };
         }
 
         function feesCalculation() {
-            var sender_currency = acceptVar().currencyCode;
-            var sender_currency_rate = acceptVar().currencyRate;
-            var sender_amount = $("input[name=amount]").val();
-            sender_amount == "" ? (sender_amount = 0) : (sender_amount = sender_amount);
+            var vars = acceptVar();
+            var amount = parseFloat($("input[name=amount]").val()) || 0;
 
-            var fixed_charge = acceptVar().currencyFixedCharge;
-            var percent_charge = acceptVar().currencyPercentCharge;
-            if ($.isNumeric(percent_charge) && $.isNumeric(fixed_charge) && $.isNumeric(sender_amount)) {
-                // Process Calculation
-                var fixed_charge_calc = parseFloat(sender_currency_rate * fixed_charge);
-                var percent_charge_calc = parseFloat(sender_currency_rate) * (parseFloat(sender_amount) / 100) * parseFloat(percent_charge);
-                var total_charge = parseFloat(fixed_charge_calc) + parseFloat(percent_charge_calc);
-                total_charge = parseFloat(total_charge).toFixed(presion);
-                // return total_charge;
+            if ($.isNumeric(vars.currencyPercentCharge) && $.isNumeric(vars.currencyFixedCharge) && $.isNumeric(amount)) {
+                var fixedCharge = parseFloat(vars.currencyRate * vars.currencyFixedCharge);
+                var percentCharge = parseFloat(vars.currencyRate) * (amount / 100) * parseFloat(vars.currencyPercentCharge);
+                var totalCharge = (fixedCharge + percentCharge).toFixed(precision);
                 return {
-                    total: total_charge,
-                    fixed: fixed_charge_calc,
-                    percent: percent_charge,
+                    total: totalCharge,
+                    fixed: fixedCharge,
+                    percent: vars.currencyPercentCharge,
                 };
-            } else {
-                // return "--";
-                return false;
             }
+            return false;
         }
 
         function getFees() {
-            var sender_currency = acceptVar().currencyCode;
-            var percent = acceptVar().currencyPercentCharge;
+            var vars = acceptVar();
             var charges = feesCalculation();
-            if (charges == false) {
-                return false;
+            if (charges) {
+                $(".fees-show").text("{{ __('Charge') }}: " + parseFloat(charges.fixed).toFixed(precision) + " " + vars.currencyCode + " + " + parseFloat(charges.percent).toFixed(precision) + "%");
+            } else {
+                $(".fees-show").text("--");
             }
-            $(".fees-show").html("{{ __('Charge') }}: " + parseFloat(charges.fixed).toFixed(presion) + " " + sender_currency + " + " + parseFloat(charges.percent).toFixed(presion) + "%");
         }
+
         function getPreview() {
-            var senderAmount = $("input[name=amount]").val();
-            var sender_currency = acceptVar().currencyCode;
-            var sender_currency_rate = acceptVar().currencyRate;
-            // var receiver_currency = acceptVar().rCurrency;
-            senderAmount == "" ? senderAmount = 0 : senderAmount = senderAmount;
+            var vars = acceptVar();
+            var amount = parseFloat($("input[name=amount]").val()) || 0;
+            var charges = feesCalculation() || { total: 0 };
 
-            // Sending Amount
-            $('.request-amount').text(senderAmount + " " + defualCurrency);
+            $('.request-amount').text(amount.toFixed(precision) + " " + defualCurrency);
+            $('.fees').text(charges.total + " " + vars.currencyCode);
 
-            // Fees
-            var charges = feesCalculation();
-            // console.log(total_charge + "--");
-            $('.fees').text(charges.total + " " + sender_currency);
+            var conversionAmount = amount * vars.currencyRate;
+            $('.conversionAmount').text(conversionAmount.toFixed(precision) + " " + vars.currencyCode);
 
-            var conversionAmount = senderAmount * sender_currency_rate;
-            $('.conversionAmount').text(parseFloat(conversionAmount).toFixed(presion) + " " + sender_currency);
-            // will get amount
-            // var willGet = parseFloat(senderAmount) - parseFloat(charges.total);
-            var willGet = parseFloat(senderAmount).toFixed(4);
+            var willGet = amount.toFixed(4);
             $('.will-get').text(willGet + " " + defualCurrency);
 
-            // Pay In Total
-            var totalPay = parseFloat(senderAmount) * parseFloat(sender_currency_rate)
-            var pay_in_total = parseFloat(charges.total) + parseFloat(totalPay);
-            $('.pay-in-total').text(parseFloat(pay_in_total).toFixed(presion) + " " + sender_currency);
-
+            var payInTotal = (parseFloat(charges.total) + conversionAmount).toFixed(precision);
+            $('.pay-in-total').text(payInTotal + " " + vars.currencyCode);
         }
 
-
-    </script>
+        // 初始化
+        updateAll();
+    });
+</script>
 @endpush

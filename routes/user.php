@@ -23,6 +23,8 @@ use App\Http\Controllers\User\WithdrawController;
 Route::prefix("user")->name("user.")->group(function(){
     Route::controller(DashboardController::class)->group(function(){
         Route::get('dashboard','index')->name('dashboard');
+        Route::get('dashboard/table','dashboardTable')->name('dashboard.table');
+        Route::get('balance/management','balanceManagement')->name('balance.management');
         Route::post('logout','logout')->name('logout');
         Route::delete('delete/account','deleteAccount')->name('delete.account')->middleware('app.mode');
     });
@@ -127,11 +129,14 @@ Route::prefix("user")->name("user.")->group(function(){
             Route::get('/','index')->name('index');
             Route::post('create','cardBuy')->name('create');
             Route::post('fund','cardFundConfirm')->name('fund');
+            Route::post('withdraw','cardWithdraw')->name('withdraw');
             Route::get('details/{card_id}','cardDetails')->name('details');
+            Route::get('transactions','allTransactions')->name('transactions');
             Route::get('transaction/{card_id}','cardTransaction')->name('transaction');
             Route::put('change/status','cardBlockUnBlock')->name('change.status');
             Route::post('make/default/remove/default','makeDefaultOrRemove')->name('make.default.or.remove');
             Route::post('flutter-wave-card-callback','cardCallBack')->name('flutterWave.callBack');
+            Route::get('add-card','cardAdd')->name('add.card');
         });
     });
      //virtual card strowallet

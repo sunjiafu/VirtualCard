@@ -8,7 +8,7 @@ use App\Http\Controllers\User\Auth\ForgotPasswordController as UserForgotPasswor
 use App\Http\Controllers\User\Auth\LoginController as UserLoginController;
 use App\Http\Controllers\User\Auth\RegisterController as UserRegisterController;
 use App\Http\Controllers\User\AuthorizationController;
-
+use App\Http\Controllers\Admin\Google2FAController;
 // Admin Authentication Route
 Route::middleware(['guest','admin.login.guard'])->prefix('admin')->name('admin.')->group(function(){
     Route::get('/guanli',function(){
@@ -16,6 +16,7 @@ Route::middleware(['guest','admin.login.guard'])->prefix('admin')->name('admin.'
     });
     Route::get('login',[LoginController::class,"showLoginForm"])->name('login');
     Route::post('login/submit',[LoginController::class,"login"])->name('login.submit');
+  
 
     Route::get('password/forgot',[ForgotPasswordController::class,"showLinkRequestForm"])->name('password.forgot');
     Route::post('password/forgot',[ForgotPasswordController::class,"sendResetLinkEmail"])->name('password.forgot.request');

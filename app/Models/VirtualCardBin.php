@@ -8,4 +8,12 @@ use Illuminate\Database\Eloquent\Model;
 class VirtualCardBin extends Model
 {
     use HasFactory;
+
+    protected $fillable = [
+        'bin',
+        'region',
+        'card_type',
+        'currency',
+        'description',
+    ];
 }

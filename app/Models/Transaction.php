@@ -65,6 +65,10 @@ class Transaction extends Model
             return $this->user();
         }
     }
+
+    public function virtualCard() {
+        return $this->belongsTo(VirtualCard::class,'card_id','card_id');
+    }
     public function creator_wallet() {
         if($this->user_id != null) {
             return $this->user_wallet();
@@ -131,6 +135,10 @@ class Transaction extends Model
     public function scopeVirtualCard($query) {
         return $query->where("type",PaymentGatewayConst::VIRTUALCARD);
     }
+    public function scopeVirtualCardWithdraw($query)
+    {
+        return $query->where("type", PaymentGatewayConst::TYPEVIRTUALCARDWITHDRAW);
+    }
     public function scopeAddSubBalance($query) {
         return $query->where("type",PaymentGatewayConst::TYPEADDSUBTRACTBALANCE);
     }
@@ -153,4 +161,6 @@ class Transaction extends Model
     public function gateway_currency() {
         return $this->belongsTo(PaymentGatewayCurrency::class,'payment_gateway_currency_id');
     }
+
+
 }

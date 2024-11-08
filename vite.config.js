@@ -7,6 +7,7 @@ export default defineConfig({
       input: [
         'resources/sass/app.scss', // 添加 SCSS 文件入口
         'resources/js/app.js',
+        'resources/css/app.css',
       ],
       refresh: true,
     }),

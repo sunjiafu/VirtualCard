@@ -35,17 +35,23 @@ class PaymentGatewayConst {
     const BILLPAY = "BILL-PAY";
     const MOBILETOPUP = "MOBILE-TOPUP";
     const VIRTUALCARD = "VIRTUAL-CARD";
-    const CARDBUY = "CARD-BUY";
-    const CARDFUND = "CARD-FUND";
+    const CARDBUY = "卡片申请";
+    const CARDFUND = "转入";
+    const TYPECONSUMPTION = '消费支出';
+    const TYPEREFUND = '退款';
+    const TYPEVIRTUALCARDWITHDRAW = '转出';
+    const TYPEFAILUREFEE = '交易失败费';
+
     const CARDWITHDRAW = "CARD-WITHDRAW";
     const GIFTCARD          = "GIFT-CARD";
-    const TYPEADDSUBTRACTBALANCE = "ADD-SUBTRACT-BALANCE";
+    const TYPEADDSUBTRACTBALANCE = "管理员操作";
 
     const STATUSSUCCESS     = 1;
     const STATUSPENDING     = 2;
     const STATUSHOLD        = 3;
     const STATUSREJECTED    = 4;
     const STATUSWAITING             = 5;
+    const STATUSFAILED            = "failed";
 
     const PAYPAL                    = 'paypal';
     const FLUTTER_WAVE              = 'flutterwave';
@@ -141,5 +147,6 @@ class PaymentGatewayConst {
             ],
         ];
     }
+
 
 }

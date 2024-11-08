@@ -43,6 +43,34 @@ class DashboardController extends Controller
         ));
     }
 
+    public function dashboardTable(){
+        $page_title = __("Dashboard Table");
+        $user = auth()->user();
+        $transactions = Transaction::auth()->latest()->take(5)->get();
+        $baseCurrency = Currency::default();
+        $totalAddMoney = Transaction::auth()->addMoney()->where('status',1)->sum('request_amount');
+        $virtualCards = activeCardData()['active_cards'];
+        $active_tickets = UserSupportTicket::authTickets()->active()->count();
+
+        return view('user.dashboard-table',compact(
+            "page_title",
+            "user",
+            "transactions",
+            "baseCurrency",
+            "totalAddMoney",
+            "virtualCards",
+            "active_tickets"
+        ));
+    }
+
+    public function balanceManagement(){
+        $page_title = __("Balance Management");
+        $user = auth()->user();
+        $transactions = Transaction::auth()->orderBy('created_at','desc')->paginate(10);
+        $totalAddMoney = Transaction::auth()->addMoney()->where('status',1)->sum('request_amount');
+        return view('user.sections.add-money.balance-management',compact('page_title','user','transactions','totalAddMoney'));
+    }
+
     public function logout(Request $request) {
         Auth::logout();
         $request->session()->invalidate();

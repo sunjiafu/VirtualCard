@@ -6,6 +6,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.0.2",
+        "bacon/bacon-qr-code": "^2.0",
         "buglinjo/laravel-webp": "^2.3",
         "doctrine/dbal": "^3.7",
         "guzzlehttp/guzzle": "^7.2",
@@ -19,6 +20,8 @@
         "laravel/tinker": "^2.7",
         "laravel/ui": "^4.1",
         "maatwebsite/excel": "^3.1",
+        "mews/captcha": "^3.3",
+        "pragmarx/google2fa-laravel": "^2.2",
         "pusher/pusher-php-server": "^7.2",
         "pusher/pusher-push-notifications": "^2.0",
         "shakurov/coinbase": "^0.7.7",

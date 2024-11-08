@@ -1,532 +1,473 @@
-@extends('user.layouts.master')
-
-@push('css')
-<link rel="stylesheet" href="{{ asset('public/frontend/') }}/css/virtual-card.css">
-<style>
-.btn-ring {
-    position: absolute;
-   top: 0px;
-    right: 0px;
-
-}
-
-</style>
-@endpush
+<!-- Card Details Page Redesign -->
+@extends('user.layouts.maste-new')
 
 @section('breadcrumb')
     @include('user.components.breadcrumb',['breadcrumbs' => [
         [
-            'name'  => __("Dashboard"),
+            'name'  => __("仪表盘"),
             'url'   => setRoute("user.dashboard"),
-        ]
-    ], 'active' => __(@$page_title)])
+        ],
+        [
+            'name' => __("虚拟信用卡"),
+            'url' => setRoute("user.virtual.card.index"),
+        ],
+        [
+            'name' => __("卡片详情"),
+            'url' => '#',
+        ],
+    ], 'active' => __("卡片详情")])
 @endsection
 
 @section('content')
-
-<div class="body-wrapper ptb-40">
-    <div class="row">
-        <div class="col-lg-4">
-            <div class="card-item">
-                <div class="card-wrapper">
-                    <div class="card-custom-area justify-content-center">
-                        <div class="backgound">
-                            <div class="left"></div>
-                            <div class="right"></div>
-                        </div>
-                        <div class="card-custom">
-                            <div class="flip">
-                                <div class="front bg_img" data-background="{{ get_image(@$cardApi->image ,'card-api') }}">
-                                    <img class="logo" src="{{ get_fav($basic_settings) }}"
-                                    alt="site-logo">
-                                    <div class="investor">{{ @$basic_settings->site_name }}</div>
-                                    <div class="chip">
-                                        <div class="chip-line"></div>
-                                        <div class="chip-line"></div>
-                                        <div class="chip-line"></div>
-                                        <div class="chip-line"></div>
-                                        <div class="chip-main"></div>
-                                    </div>
-                                    <svg class="wave" viewBox="0 3.71 26.959 38.787" width="26.959" height="38.787" fill="white">
-                                        <path d="M19.709 3.719c.266.043.5.187.656.406 4.125 5.207 6.594 11.781 6.594 18.938 0 7.156-2.469 13.73-6.594 18.937-.195.336-.57.531-.957.492a.9946.9946 0 0 1-.851-.66c-.129-.367-.035-.777.246-1.051 3.855-4.867 6.156-11.023 6.156-17.718 0-6.696-2.301-12.852-6.156-17.719-.262-.317-.301-.762-.102-1.121.204-.36.602-.559 1.008-.504z"></path>
-                                        <path d="M13.74 7.563c.231.039.442.164.594.343 3.508 4.059 5.625 9.371 5.625 15.157 0 5.785-2.113 11.097-5.625 15.156-.363.422-1 .472-1.422.109-.422-.363-.472-1-.109-1.422 3.211-3.711 5.156-8.551 5.156-13.843 0-5.293-1.949-10.133-5.156-13.844-.27-.309-.324-.75-.141-1.114.188-.367.578-.582.985-.542h.093z"></path>
-                                        <path d="M7.584 11.438c.227.031.438.144.594.312 2.953 2.863 4.781 6.875 4.781 11.313 0 4.433-1.828 8.449-4.781 11.312-.398.387-1.035.383-1.422-.016-.387-.398-.383-1.035.016-1.421 2.582-2.504 4.187-5.993 4.187-9.875 0-3.883-1.605-7.372-4.187-9.875-.321-.282-.426-.739-.266-1.133.164-.395.559-.641.984-.617h.094zM1.178 15.531c.121.02.238.063.344.125 2.633 1.414 4.437 4.215 4.437 7.407 0 3.195-1.797 5.996-4.437 7.406-.492.258-1.102.07-1.36-.422-.257-.492-.07-1.102.422-1.359 2.012-1.075 3.375-3.176 3.375-5.625 0-2.446-1.371-4.551-3.375-5.625-.441-.204-.676-.692-.551-1.165.122-.468.567-.785 1.051-.742h.094z"></path>
-                                    </svg>
-                                    @php
-                                     $card_pan = str_split($myCard->card_pan, 4);
-                                    @endphp
-                                    <div class="card-number">
-                                        @foreach($card_pan as $key => $value)
-                                        <div class="section">{{ $value }}</div>
-                                        @endforeach
-                                    </div>
-
-                                    <div class="end"><span class="end-text">{{__("exp. end")}}:</span><span class="end-date"> {{ date("m/Y",strtotime($myCard->expiration)) }}</span>
-                                    </div>
-                                    <div class="card-holder">{{ auth()->user()->fullname }}</div>
-                                    <div class="master">
-                                        @if($myCard->card_type === "visa")
-                                        <h3 class="title">{{ __("VISA") }}</h3>
-                                        @else
-                                        <div class="circle master-red"></div>
-                                        <div class="circle master-yellow"></div>
-                                        @endif
-                                    </div>
-                                </div>
-                                <div class="back">
-                                    <div class="strip-black"></div>
-                                    <div class="ccv">
-                                        <label>{{ __("ccv") }}</label>
-                                        <div>{{ $myCard->cvv }}</div>
-                                    </div>
-                                    <div class="terms">
-                                        @php
-                                        echo  @$card_details->card_details
-                                    @endphp
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-content text-center d-flex justify-content-center mt-3">
-
-                        <div class="card-details">
-                            <a href="javascript:void(0)" class="fundCard" data-id="{{ $myCard->id }}">
-                                <div class="details-icon">
-                                    <i class="las la-coins"></i>
-                                </div>
-                                <h5 class="title">{{ __("Fund") }}</h5>
-                            </a>
-                        </div>
-                        <div class="card-details">
-                            <a href="{{  setRoute('user.virtual.card.transaction',$myCard->card_id) }}">
-                                <div class="details-icon">
-                                    <i class="menu-icon las la-recycle"></i>
-                                </div>
-                                <h5 class="title">{{__("Transactions")}}</h5>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-8">
-            <div class="card-prevew pt-2">
-                <div class="preview-list-wrapper">
-                    <div class="preview-list-item">
-                        <div class="preview-list-left">
-                            <div class="preview-list-user-wrapper">
-                                <div class="preview-list-user-icon">
-                                    <i class="las la-hand-holding-heart"></i>
-                                </div>
-                                <div class="preview-list-user-content">
-                                    <span>{{ __("Current Balance") }}</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="preview-list-right">
-                            <span class="text--base">{{ getAmount(@$myCard->amount,2) }} {{ get_default_currency_code() }}</span>
-                        </div>
-                    </div>
-                    <div class="preview-list-item">
-                        <div class="preview-list-left">
-                            <div class="preview-list-user-wrapper">
-                                <div class="preview-list-user-icon">
-                                    <i class="las la-hourglass-end"></i>
-                                </div>
-                                <div class="preview-list-user-content">
-                                    <span>{{ __("Card Type") }}</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="preview-list-right">
-                            <span class="text--warning">{{ __((ucwords(@$myCard->card_type))) }}</span>
-                        </div>
-                    </div>
-                    <div class="preview-list-item">
-                        <div class="preview-list-left">
-                            <div class="preview-list-user-wrapper">
-                                <div class="preview-list-user-icon">
-                                    <i class="las la-credit-card"></i>
-                                </div>
-                                <div class="preview-list-user-content">
-                                    <span>{{ __("Card Id") }}</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="preview-list-right">
-                            <span>{{ @$myCard->card_id }}</span>
-                        </div>
-                    </div>
-                    <!-- <div class="preview-list-item">
-                        <div class="preview-list-left">
-                            <div class="preview-list-user-wrapper">
-                                <div class="preview-list-user-icon">
-                                    <i class="las la-hourglass-end "></i>
-                                </div>
-                                <div class="preview-list-user-content">
-                                    <span>{{ __("Account Id") }}</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="preview-list-right">
-                            <span>{{ @$myCard->account_id }}</span>
-                        </div>
-                    </div> -->
-                    <div class="preview-list-item">
-                        <div class="preview-list-left">
-                            <div class="preview-list-user-wrapper">
-                                <div class="preview-list-user-icon">
-                                    <i class="las la-user-tag"></i>
-                                </div>
-                                <div class="preview-list-user-content">
-                                    <span>{{ __("Card Pan") }}</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="preview-list-right">
-                            @php
-                            $card_pan = str_split($myCard->card_pan, 4);
-                           @endphp
-                               @foreach($card_pan as $key => $value)
-                               <span>{{ @$value }}</span>
-                               @endforeach
-                        </div>
-                    </div>
-                    <!-- <div class="preview-list-item">
-                        <div class="preview-list-left">
-                            <div class="preview-list-user-wrapper">
-                                <div class="preview-list-user-icon">
-                                    <i class="las la-truck-loading"></i>
-                                </div>
-                                <div class="preview-list-user-content">
-                                    <span>{{__("Card Masked")}}</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="preview-list-right">
-                            <span>{{ @$myCard->masked_card }}</span>
-                        </div>
-                    </div> -->
-
-                    <div class="preview-list-item">
-                        <div class="preview-list-left">
-                            <div class="preview-list-user-wrapper">
-                                <div class="preview-list-user-icon">
-                                    <i class="las la-hourglass-start"></i>
-                                </div>
-                                <div class="preview-list-user-content">
-                                    <span>{{ __("Cvv") }}</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="preview-list-right">
-                            <span>{{ __(@$myCard->cvv) }}</span>
-                        </div>
-                    </div>
-                    <div class="preview-list-item">
-                        <div class="preview-list-left">
-                            <div class="preview-list-user-wrapper">
-                                <div class="preview-list-user-icon">
-                                    <i class="las la-business-time"></i>
-                                </div>
-                                <div class="preview-list-user-content">
-                                    <span>{{__("Expiration")}}</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="preview-list-right">
-                            <span>{{date("m/Y",strtotime(@$myCard->expiration)) }}</span>
-                        </div>
-                    </div>
-                    <div class="preview-list-item">
-                        <div class="preview-list-left">
-                            <div class="preview-list-user-wrapper">
-                                <div class="preview-list-user-icon">
-                                    <i class="las la-city"></i>
-                                </div>
-                                <div class="preview-list-user-content">
-                                    <span>{{ __("City") }}</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="preview-list-right">
-                            <span>{{ __($myCard->city) }}</span>
-                        </div>
-                    </div>
-                    <div class="preview-list-item">
-                        <div class="preview-list-left">
-                            <div class="preview-list-user-wrapper">
-                                <div class="preview-list-user-icon">
-                                    <i class="las la-city"></i>
-                                </div>
-                                <div class="preview-list-user-content">
-                                    <span>{{ __("State") }}</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="preview-list-right">
-                            <span>{{ __($myCard->state) }}</span>
-                        </div>
-                    </div>
-                    <div class="preview-list-item">
-                        <div class="preview-list-left">
-                            <div class="preview-list-user-wrapper">
-                                <div class="preview-list-user-icon">
-                                    <i class="las la-city"></i>
-                                </div>
-                                <div class="preview-list-user-content">
-                                    <span>{{__("Address")}}</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="preview-list-right">
-                            <span>{{ __($myCard->address) }}</span>
-                        </div>
-                    </div>
-                    <div class="preview-list-item">
-                        <div class="preview-list-left">
-                            <div class="preview-list-user-wrapper">
-                                <div class="preview-list-user-icon">
-                                    <i class="las la-file-archive"></i>
-                                </div>
-                                <div class="preview-list-user-content">
-                                    <span>{{__("Zip Code")}}</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="preview-list-right">
-                            <span>{{ __($myCard->zip_code) }}</span>
-                        </div>
-                    </div>
-                    <div class="preview-list-item">
-                        <div class="preview-list-left">
-                            <div class="preview-list-user-wrapper">
-                                <div class="preview-list-user-icon">
-                                    <i class="las la-battery-half"></i>
-                                </div>
-                                <div class="preview-list-user-content">
-                                    <span>{{ __("Status") }}</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="preview-list-right">
-                            <div class="toggle-container">
-                                @include('admin.components.form.switcher',[
-
-                                    'name'          => 'is_active',
-                                    'value'         => old('is_active',@$myCard->is_active ),
-                                    'options'       => ['Unblock' => 1,'Block' => 0],
-                                    'onload'        => true,
-                                    'data_target'   =>@$myCard->id,
-                                ])
-                            </div>
-                        </div>
-                    </div>
+    <div class="px-3 px-xxl-5 py-3 py-lg-4 border-bottom border-gray-200 after-header">
+        <div class="container-fluid px-0">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h1 class="h2 mb-0">量子卡详情</h1>
                 </div>
             </div>
         </div>
     </div>
-</div>
+    <div class="p-3 p-xxl-5">
+        <div class="container-fluid px-0">
+            <div class="row">
+                <!-- 左侧银行卡 -->
+                <div class="col-md-4 mb-4">
+                    <div class="card rounded-12 shadow h-100">
+                        <div class="card-body text-center">
+                            <div class="card-custom-area">
+                                <div class="card-wrapper">
+                                    <div class="card-custom" style="position: relative; width: 350px; height: 220px; border-radius: 15px; background: linear-gradient(135deg, #0d47a1, #1976d2); color: #fff; padding: 20px; margin-bottom: 20px; margin-left: auto; margin-right: auto;">
+                                        <div class="card-logo" style="position: absolute; top: 20px; left: 20px;">
+                                            <img class="logo" src="{{ get_fav($basic_settings) }}" alt="site-logo" style="width: 40px;">
+                                        </div>
+                                        <div class="card-number" style="position: absolute; top: 80px; left: 20px; font-size: 1.3rem; letter-spacing: 2px; font-weight: bold;">
+                                            {{ implode(' ', str_split(@$myCard->card_pan, 4)) }}
+                                        </div>
+                                        <div class="card-holder" style="position: absolute; bottom: 50px; left: 20px; font-size: 0.9rem;">
+                                            {{ auth()->user()->fullname }}
+                                        </div>
+                                        <div class="valid-thru" style="position: absolute; bottom: 20px; left: 20px; font-size: 0.8rem;">
+                                            {{ date('m/Y', strtotime($myCard->expiration)) }}
+                                        </div>
+                                        <div class="card-cvv" style="position: absolute; bottom: 20px; right: 20px; font-size: 0.8rem;">
+                                            CVV: {{ @$myCard->cvv }}
+                                        </div>
+                                        <div class="card-type" style="position: absolute; top: 20px; right: 20px; font-size: 1rem;">
+                                            {{ __($myCard->card_type == "visa" ? "VISA" : "Mastercard") }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-actions mt-4">
+                                <a href="javascript:void(0)" class="btn btn-outline-primary me-2 fundCard" data-id="{{ $myCard->id }}">充值</a>
+                                <a href="javascript:void(0)" class="btn btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#withdrawModal">转出</a>
+                                <a href="#" class="btn btn-outline-warning me-2">冻结</a>
+                                <a href="#" class="btn btn-outline-danger">删除</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 右侧内容 -->
+                <div class="col-md-8 mb-4">
+                    <!-- 左对齐的复制按钮 -->
+                    <div class="d-flex justify-content-start mb-3">
+                        <button id="copyCardDetailsBtn" class="btn btn-outline-primary">
+                            <i class="fas fa-copy"></i> 复制信息
+                        </button>
+                    </div>
 
-
-<div class="modal fade" id="FundCardModal" tabindex="-1" aria-labelledby="card-modal" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header" id="buycard-modal">
-                <h4 class="modal-title">{{__("Fund Card")}}</h4>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"><i class="las la-times"></i></button>
+                    <!-- 调整右侧卡片的大小 -->
+                    <div class="row g-4">
+                        <div class="col-md-6 col-lg-6">
+                            <!-- 可用余额卡片 -->
+                            <div class="card rounded-12 shadow h-100">
+                                <div class="card-body p-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar avatar-md bg-light-primary text-primary rounded-12 me-3">
+                                            <i class="fas fa-wallet fa-lg"></i>
+                                        </div>
+                                        <div>
+                                            <span class="caption text-gray-600 d-block mb-1">可用余额</span>
+                                            <span class="h4 mb-0">${{ getAmount(@$myCard->amount, 2) }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 累计消费卡片 -->
+                        <div class="col-md-6 col-lg-6">
+                            <div class="card rounded-12 shadow h-100">
+                                <div class="card-body p-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar avatar-md bg-light-success text-success rounded-12 me-3">
+                                            <i class="fas fa-shopping-cart fa-lg"></i>
+                                        </div>
+                                        <div>
+                                            <span class="caption text-gray-600 d-block mb-1">累计消费</span>
+                                            <span class="h4 mb-0">${{ getAmount(@$myCard->total_spent, 2) }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 累计充值卡片 -->
+                        <div class="col-md-6 col-lg-6">
+                            <div class="card rounded-12 shadow h-100">
+                                <div class="card-body p-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar avatar-md bg-light-info text-info rounded-12 me-3">
+                                            <i class="fas fa-coins fa-lg"></i>
+                                        </div>
+                                        <div>
+                                            <span class="caption text-gray-600 d-block mb-1">累计充值</span>
+                                            <span class="h4 mb-0">${{ number_format($totalreloaded, 2) }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 累计转出卡片 -->
+                        <div class="col-md-6 col-lg-6">
+                            <div class="card rounded-12 shadow h-100">
+                                <div class="card-body p-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar avatar-md bg-light-danger text-danger rounded-12 me-3">
+                                            <i class="fas fa-exchange-alt fa-lg"></i>
+                                        </div>
+                                        <div>
+                                            <span class="caption text-gray-600 d-block mb-1">累计转出</span>
+                                            <span class="h4 mb-0">${{ number_format($totalwithdrawn, 2) }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 账单地址文本 -->
+                        <div class="col-12">
+                            <div class="card rounded-12 shadow h-100">
+                                <div class="card-body p-3">
+                                    <h5 class="card-title mb-2">账单地址</h5>
+                                    <p class="mb-0 text-gray-600">{{ @$myCard->address }}, {{ @$myCard->city }}, {{ @$myCard->state }}, {{ @$myCard->zipcode }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="modal-body">
+            <!-- 交易记录表格 -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card rounded-12 shadow h-100">
+                        <div class="d-flex align-items-center px-3 px-md-4 py-3">
+                            <h5 class="card-header-title mb-0 ps-md-2 font-weight-semibold">交易记录</h5>
+                        </div>
+                        <div class="table-responsive mb-0">
+                            <table class="table card-table table-nowrap overflow-hidden">
+                                <thead>
+                                    <tr>
+                                        <th>{{ __('日期') }}</th>
+                                        <th>{{ __('交易类型') }}</th>
+                                        <th>{{ __('详情') }}</th>
+                                        <th>{{ __('金额') }}</th>
+                                        <th>{{ __('币种') }}</th>
+                                        <th>{{ __('交易状态') }}</th>
+                                        <th>{{ __('备注') }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="list">
+                                    @forelse ($transactions as $transaction)
+                                        <tr>
+                                            <td>{{ $transaction->created_at->format('Y-m-d H:i') }}</td>
+                                            <td>{{ $transaction->type }}</td>
+                                            <td>{{ $transaction->product }}</td>
+                                            <td>{{ $transaction->amount }}</td>
+                                            <td>{{ $transaction->currency }}</td>
+                                            <td>
+                                                @if($transaction->status == \App\Constants\PaymentGatewayConst::STATUSSUCCESS)
+                                                    <span class="badge bg-success text-success-500">{{ __('成功') }}</span>
+                                                @elseif($transaction->status == \App\Constants\PaymentGatewayConst::STATUSPENDING)
+                                                    <span class="badge bg-warning text-warning-500">{{ __('待处理') }}</span>
+                                                @elseif($transaction->status == \App\Constants\PaymentGatewayConst::STATUSFAILED)
+                                                    <span class="badge bg-danger text-danger-500">{{ __('失败') }}</span>
+                                                @endif
+                                            </td>
+                                            <td>{{ $transaction->remarks }}</td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="5" class="text-center">{{ __('暂无交易记录') }}</td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- 分页控件 -->
+                        <div class="d-flex justify-content-between align-items-center px-3 px-md-4 py-3">
+                            {{ $transactions->links('vendor.pagination.muse-dashboard') }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @include('user.partials.footer')
+    </div>
 
+    <!-- Fund Card Modal -->
+    <div class="modal fade" id="FundCardModal" tabindex="-1" aria-labelledby="card-modal" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">{{ __("Fund Card") }}</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
                     <form class="card-form row g-4" action="{{ route('user.virtual.card.fund') }}" method="POST">
                         @csrf
                         <input type="hidden" name="id">
-                    <div class="col-12">
-                        <div class="row">
+                        <div class="col-12">
                             <div class="form-group">
-                                <label>{{__("Fund Amount")}}<span>*</span></label>
-                                <input type="number" class="form--control" required placeholder="{{ __("Enter Amount") }}" name="fund_amount" value="{{ old("fund_amount") }}">
-                                <div class="currency">
+                                <label>{{ __("Fund Amount") }}<span>*</span></label>
+                                <input type="number" class="form-control" required placeholder="{{ __("Enter Amount") }}" name="fund_amount" value="{{ old("fund_amount") }}">
+                                <div class="currency mt-2">
                                     <p>{{ get_default_currency_code() }}</p>
                                 </div>
-                               <div class="d-flex justify-content-between">
-                                <code class="d-block mt-3  text--base fw-bold balance-show fund-limit-show">--</code>
-                                <code class="d-block mt-3  text--base fw-bold balance-show">{{ __(" Balance: ") }} {{ authWalletBalance() }} {{ get_default_currency_code() }}</code>
-                               </div>
+                                <div class="d-flex justify-content-between mt-3">
+                                    <code class="text--base fw-bold balance-show fund-limit-show">--</code>
+                                    <code class="text--base fw-bold balance-show">{{ __(" Balance: ") }} {{ authWalletBalance() }} {{ get_default_currency_code() }}</code>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-12">
-                        <div class="ps-4">
-                            <div class="d-flex justify-content-between">
-                                <h3 class="fs-6 fw-lighter py-1 text-capitalize">&bull; {{ __("Total Charge") }} :
-                                </h3>
-                                <h3 class="fs-6 fw-lighter py-1 text-capitalize fund-fees-show">--</h3>
+                        <div class="col-12">
+                            <div class="ps-4">
+                                <div class="d-flex justify-content-between">
+                                    <h3 class="fs-6 fw-lighter py-1 text-capitalize">&bull; {{ __("Total Charge") }} :</h3>
+                                    <h3 class="fs-6 fw-lighter py-1 text-capitalize fund-fees-show">--</h3>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <h3 class="fs-6 fw-lighter py-1 text-capitalize">&bull; {{ __("Total Pay") }} :</h3>
+                                    <h3 class="fs-6 fw-lighter py-1 text-capitalize fund-payable-total">--</h3>
+                                </div>
                             </div>
-                            <div class="d-flex justify-content-between">
-                                <h3 class="fs-6 fw-lighter py-1 text-capitalize">&bull; {{__("Total Pay")}} :
-                                </h3>
-                                <h3 class="fs-6 fw-lighter py-1 text-capitalize fund-payable-total">--</h3>
-                            </div>
-
                         </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn--base w-100 btn-loading fund-btn">{{ __("Confirm") }}</button>
-                    </div>
-                </form>
-
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary w-100 btn-lg fund-btn">{{ __("Confirm") }}</button>
+                        </div>
+                    </form>
+                </div>
             </div>
-
         </div>
     </div>
-</div>
+
+    <!-- 转出模态框 -->
+    <div class="modal fade" id="withdrawModal" tabindex="-1" aria-labelledby="withdrawModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content shadow-dark-80">
+          <form action="{{ route('user.virtual.card.withdraw') }}" method="POST">
+            @csrf
+            <div class="modal-header border-0 pb-0 align-items-start ps-4">
+              <h5 class="modal-title pt-3" id="withdrawModalLabel">从卡片转出资金</h5>
+              <button type="button" class="btn btn-icon p-0" data-bs-dismiss="modal" aria-label="关闭">
+                <!-- Close icon -->
+                <svg data-name="icons/tabler/close" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                  <rect data-name="Icons/Tabler/Close background" width="16" height="16" fill="none"></rect>
+                  <path d="M.82.1l.058.05L6,5.272,11.122.151A.514.514,0,0,1,11.9.82l-.05.058L6.728,6l5.122,5.122a.514.514,0,0,1-.67.777l-.058-.05L6,6.728.878,11.849A.514.514,0,0,1,.1,11.18l.05-.058L5.272,6,.151.878A.514.514,0,0,1,.75.057Z" transform="translate(2 2)" fill="#1e1e1e"></path>
+                </svg>
+              </button>
+            </div>
+            <div class="modal-body pt-2 px-4">
+              <div class="mb-3">
+                <label for="withdraw_amount" class="form-label">转出金额</label>
+                <input type="number" class="form-control" name="withdraw_amount" id="withdraw_amount" min="0" step="0.01" required>
+                <input type="hidden" name="id" value="{{ $myCard->id }}">
+              </div>
+              <p>卡片余额：{{ number_format($myCard->amount, 2) }}</p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-light px-2" data-bs-dismiss="modal">
+                <span class="px-1">取消</span>
+              </button>
+              <button type="submit" class="btn btn-primary px-2 ms-2">
+                <span class="px-1">确认转出</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- 添加隐藏的 textarea，用于复制内容 -->
+    <textarea id="cardDetailsText" style="position: absolute; left: -9999px; top: -9999px;"></textarea>
+
+    <!-- 添加在页面合适的位置 -->
+    <div id="copySuccessAlert" class="alert alert-success alert-dismissible fade show" role="alert" style="position: fixed; top: 20px; right: 20px; z-index: 1050; display: none;">
+        <i class="fas fa-check-circle me-2"></i>
+        {{ __('卡片信息已复制到剪贴板') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="关闭"></button>
+    </div>
 @endsection
 
 @push('script')
 <script>
-     $(document).ready(function(){
-        switcherAjax("{{ setRoute('user.virtual.card.change.status') }}");
-    })
-
-    var defualCurrency = "{{ get_default_currency_code() }}";
-    var defualCurrencyRate = "{{ get_default_currency_rate() }}";
-    $('.fundCard').on('click', function () {
+    $(document).ready(function() {
+        $('.fundCard').on('click', function() {
             var modal = $('#FundCardModal');
             modal.find('input[name=id]').val($(this).data('id'));
-            $(document).ready(function(){
-                getLimit();
-                getFees();
-                getPreview();
-            });
-            $("input[name=fund_amount]").keyup(function(){
-                getFees();
-                getPreview();
-            });
-            $("input[name=fund_amount]").focusout(function(){
-                enterLimit();
-            });
-
-            function getLimit() {
-                var currencyCode = acceptVar().currencyCode;
-                var currencyRate = acceptVar().currencyRate;
-
-                var min_limit = acceptVar().currencyMinAmount;
-                var max_limit =acceptVar().currencyMaxAmount;
-                if($.isNumeric(min_limit) || $.isNumeric(max_limit)) {
-                    var min_limit_calc = parseFloat(min_limit/currencyRate).toFixed(2);
-                    var max_limit_clac = parseFloat(max_limit/currencyRate).toFixed(2);
-                    $('.fund-limit-show').html("{{ __('Limit') }} " + min_limit_calc + " " + currencyCode + " - " + max_limit_clac + " " + currencyCode);
-
-                    return {
-                        minLimit:min_limit_calc,
-                        maxLimit:max_limit_clac,
-                    };
-                }else {
-                    $('.fund-limit-show').html("--");
-                    return {
-                        minLimit:0,
-                        maxLimit:0,
-                    };
-                }
-            }
-            function acceptVar() {
-
-                var currencyCode = defualCurrency;
-                var currencyRate = defualCurrencyRate;
-                var currencyMinAmount ="{{getAmount($cardReloadCharge->min_limit)}}";
-                var currencyMaxAmount = "{{getAmount($cardReloadCharge->max_limit)}}";
-                var currencyFixedCharge = "{{getAmount($cardReloadCharge->fixed_charge)}}";
-                var currencyPercentCharge = "{{getAmount($cardReloadCharge->percent_charge)}}";
-
-
-                return {
-                    currencyCode:currencyCode,
-                    currencyRate:currencyRate,
-                    currencyMinAmount:currencyMinAmount,
-                    currencyMaxAmount:currencyMaxAmount,
-                    currencyFixedCharge:currencyFixedCharge,
-                    currencyPercentCharge:currencyPercentCharge,
-
-
-                };
-            }
-            function feesCalculation() {
-                var currencyCode = acceptVar().currencyCode;
-                var currencyRate = acceptVar().currencyRate;
-                var sender_amount = $("input[name=fund_amount]").val();
-                sender_amount == "" ? (sender_amount = 0) : (sender_amount = sender_amount);
-
-                var fixed_charge = acceptVar().currencyFixedCharge;
-                var percent_charge = acceptVar().currencyPercentCharge;
-                if ($.isNumeric(percent_charge) && $.isNumeric(fixed_charge) && $.isNumeric(sender_amount)) {
-                    // Process Calculation
-                    var fixed_charge_calc = parseFloat(currencyRate * fixed_charge);
-                    var percent_charge_calc = parseFloat(currencyRate)*(parseFloat(sender_amount) / 100) * parseFloat(percent_charge);
-                    var total_charge = parseFloat(fixed_charge_calc) + parseFloat(percent_charge_calc);
-                    total_charge = parseFloat(total_charge).toFixed(2);
-                    // return total_charge;
-                    return {
-                        total: total_charge,
-                        fixed: fixed_charge_calc,
-                        percent: percent_charge,
-                    };
-                } else {
-                    // return "--";
-                    return false;
-                }
-            }
-
-            function getFees() {
-                var currencyCode = acceptVar().currencyCode;
-                var percent = acceptVar().currencyPercentCharge;
-                var charges = feesCalculation();
-                if (charges == false) {
-                    return false;
-                }
-                $(".fund-fees-show").html( parseFloat(charges.fixed).toFixed(2) + " " + currencyCode + " + " + parseFloat(charges.percent).toFixed(2) + "% = " + parseFloat(charges.total).toFixed(2) + " " + currencyCode);
-            }
-            function getPreview() {
-                    var senderAmount = $("input[name=fund_amount]").val();
-                    var charges = feesCalculation();
-                    var sender_currency = acceptVar().currencyCode;
-                    var sender_currency_rate = acceptVar().currencyRate;
-
-                    senderAmount == "" ? senderAmount = 0 : senderAmount = senderAmount;
-                    // Sending Amount
-                    // Fees
-                    var charges = feesCalculation();
-
-                    var totalPay = parseFloat(senderAmount) * parseFloat(sender_currency_rate)
-                    var pay_in_total = 0;
-                    if(senderAmount == 0 ||  senderAmount == ''){
-                        pay_in_total = 0;
-                    }else{
-                        pay_in_total =  parseFloat(totalPay) + parseFloat(charges.total);
-                    }
-                    $('.fund-payable-total').html( pay_in_total + " " + sender_currency);
-
-            }
-            function enterLimit(){
-                var min_limit = parseFloat("{{getAmount($cardReloadCharge->min_limit)}}");
-                var max_limit =parseFloat("{{getAmount($cardReloadCharge->max_limit)}}");
-                var currencyRate = acceptVar().currencyRate;
-                var sender_amount = parseFloat($("input[name=fund_amount]").val());
-
-                if( sender_amount < min_limit ){
-                    throwMessage('error',["{{ __('Please follow the mimimum limit') }}"]);
-                    $('.fund-btn').attr('disabled',true)
-                }else if(sender_amount > max_limit){
-                    throwMessage('error',["{{ __('Please follow the maximum limit') }}"]);
-                    $('.fund-btn').attr('disabled',true)
-                }else{
-                    $('.fund-btn').attr('disabled',false)
-                }
-
-            }
+            getLimit();
+            getFees();
+            getPreview();
             modal.modal('show');
         });
 
+        $("input[name=fund_amount]").on('keyup focusout', function(){
+            getFees();
+            getPreview();
+        });
+
+        function getLimit() {
+            var currencyCode = acceptVar().currencyCode;
+            var currencyRate = acceptVar().currencyRate;
+
+            var min_limit = acceptVar().currencyMinAmount;
+            var max_limit = acceptVar().currencyMaxAmount;
+            if($.isNumeric(min_limit) || $.isNumeric(max_limit)) {
+                var min_limit_calc = parseFloat(min_limit/currencyRate).toFixed(2);
+                var max_limit_calc = parseFloat(max_limit/currencyRate).toFixed(2);
+                $('.fund-limit-show').html("{{ __('Limit') }} " + min_limit_calc + " " + currencyCode + " - " + max_limit_calc + " " + currencyCode);
+
+                return {
+                    minLimit:min_limit_calc,
+                    maxLimit:max_limit_calc,
+                };
+            } else {
+                $('.fund-limit-show').html("--");
+                return {
+                    minLimit:0,
+                    maxLimit:0,
+                };
+            }
+        }
+
+        function acceptVar() {
+            var currencyCode = "{{ get_default_currency_code() }}";
+            var currencyRate = "{{ get_default_currency_rate() }}";
+            var currencyMinAmount ="{{getAmount($cardReloadCharge->min_limit)}}";
+            var currencyMaxAmount = "{{getAmount($cardReloadCharge->max_limit)}}";
+            var currencyFixedCharge = "{{getAmount($cardReloadCharge->fixed_charge)}}";
+            var currencyPercentCharge = "{{getAmount($cardReloadCharge->percent_charge)}}";
+
+            return {
+                currencyCode:currencyCode,
+                currencyRate:currencyRate,
+                currencyMinAmount:currencyMinAmount,
+                currencyMaxAmount:currencyMaxAmount,
+                currencyFixedCharge:currencyFixedCharge,
+                currencyPercentCharge:currencyPercentCharge,
+            };
+        }
+
+        function feesCalculation() {
+            var currencyCode = acceptVar().currencyCode;
+            var currencyRate = acceptVar().currencyRate;
+            var sender_amount = $("input[name=fund_amount]").val();
+            sender_amount == "" ? (sender_amount = 0) : (sender_amount = sender_amount);
+
+            var fixed_charge = acceptVar().currencyFixedCharge;
+            var percent_charge = acceptVar().currencyPercentCharge;
+            if ($.isNumeric(percent_charge) && $.isNumeric(fixed_charge) && $.isNumeric(sender_amount)) {
+                // Process Calculation
+                var fixed_charge_calc = parseFloat(currencyRate * fixed_charge);
+                var percent_charge_calc = parseFloat(currencyRate)*(parseFloat(sender_amount) / 100) * parseFloat(percent_charge);
+                var total_charge = parseFloat(fixed_charge_calc) + parseFloat(percent_charge_calc);
+                total_charge = parseFloat(total_charge).toFixed(2);
+                // return total_charge;
+                return {
+                    total: total_charge,
+                    fixed: fixed_charge_calc,
+                    percent: percent_charge,
+                };
+            } else {
+                // return "--";
+                return false;
+            }
+        }
+
+        function getFees() {
+            var currencyCode = acceptVar().currencyCode;
+            var percent = acceptVar().currencyPercentCharge;
+            var charges = feesCalculation();
+            if (charges == false) {
+                return false;
+            }
+            $(".fund-fees-show").html( parseFloat(charges.fixed).toFixed(2) + " " + currencyCode + " + " + parseFloat(charges.percent).toFixed(2) + "% = " + parseFloat(charges.total).toFixed(2) + " " + currencyCode);
+        }
+        function getPreview() {
+            var senderAmount = $("input[name=fund_amount]").val();
+            var charges = feesCalculation();
+            var sender_currency = acceptVar().currencyCode;
+            var sender_currency_rate = acceptVar().currencyRate;
+
+            senderAmount == "" ? senderAmount = 0 : senderAmount = senderAmount;
+            // Sending Amount
+            // Fees
+            var charges = feesCalculation();
+
+            var totalPay = parseFloat(senderAmount) * parseFloat(sender_currency_rate)
+            var pay_in_total = 0;
+            if(senderAmount == 0 ||  senderAmount == ''){
+                pay_in_total = 0;
+            }else{
+                pay_in_total =  parseFloat(totalPay) + parseFloat(charges.total);
+            }
+            $('.fund-payable-total').html( pay_in_total + " " + sender_currency);
+
+        }
+
+        // 一键复制功能
+        $('#copyCardDetailsBtn').on('click', function() {
+            // 准备需要复制的卡片信息
+            var cardNumber = "{{ $myCard->card_pan }}";
+            var expirationDate = "{{ date('m/Y', strtotime($myCard->expiration)) }}";
+            var cvv = "{{ $myCard->cvv }}";
+            var cardHolder = "{{ auth()->user()->fullname }}";
+            var cardType = "{{ $myCard->card_type == 'visa' ? 'VISA' : 'Mastercard' }}";
+
+            var cardDetails = "卡片类型：" + cardType + "\n" +
+                              "卡号：" + cardNumber + "\n" +
+                              "有效期：" + expirationDate + "\n" +
+                              "CVV：" + cvv + "\n" +
+                              "持卡人：" + cardHolder;
+
+            // 将卡片信息放入隐藏的 textarea
+            var $temp = $("<textarea>");
+            $("body").append($temp);
+            $temp.val(cardDetails).select();
+
+            try {
+                var successful = document.execCommand('copy');
+                if (successful) {
+                    // 显示复制成功的 Alert
+                    $('#copySuccessAlert').fadeIn();
+
+                    // 设置 3 秒后自动隐藏
+                    setTimeout(function() {
+                        $('#copySuccessAlert').fadeOut();
+                    }, 3000);
+                } else {
+                    alert('{{ __('复制失败，请手动复制') }}');
+                }
+            } catch (err) {
+                alert('{{ __('复制失败，请手动复制') }}');
+            }
+
+            // 移除临时元素
+            $temp.remove();
+        });
+
+        // 当点击关闭按钮时，隐藏 Alert
+        $('#copySuccessAlert .btn-close').on('click', function() {
+            $('#copySuccessAlert').fadeOut();
+        });
+    });
 </script>
 @endpush
