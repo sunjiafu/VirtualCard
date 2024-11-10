@@ -19,6 +19,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 
 class VirtualcardController extends Controller
 {
@@ -569,5 +570,22 @@ class VirtualcardController extends Controller
         ];
 
         return view('user.sections.virtual-card.transactions', compact('page_title', 'transactions', 'transactionTypes'));
+    }
+
+    public function getFullInfo(Request $request, $card_id)
+    {
+        $myCard = VirtualCard::where('card_id', $card_id)->firstOrFail();
+
+        // 验证当前用户是否有权查看该卡片信息
+        if ($myCard->user_id != auth()->id()) {
+            abort(403, '无权访问');
+        }
+
+        // 返回解密后的数据
+        return response()->json([
+            'card_pan'    => $myCard->card_pan_decrypted,
+            'cvv'         => $myCard->cvv_decrypted,
+            'expiration'  => $myCard->expiration_decrypted,
+        ]);
     }
 }

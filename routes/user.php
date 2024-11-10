@@ -137,6 +137,7 @@ Route::prefix("user")->name("user.")->group(function(){
             Route::post('make/default/remove/default','makeDefaultOrRemove')->name('make.default.or.remove');
             Route::post('flutter-wave-card-callback','cardCallBack')->name('flutterWave.callBack');
             Route::get('add-card','cardAdd')->name('add.card');
+            Route::get('full-info/{card_id}','getFullInfo')->name('full.info');
         });
     });
      //virtual card strowallet

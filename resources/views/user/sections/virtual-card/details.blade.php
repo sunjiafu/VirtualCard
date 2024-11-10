@@ -23,7 +23,7 @@
         <div class="container-fluid px-0">
             <div class="row align-items-center">
                 <div class="col">
-                    <h1 class="h2 mb-0">量子卡详情</h1>
+                    <h1 class="h2 mb-0">卡片详情</h1>
                 </div>
             </div>
         </div>
@@ -35,30 +35,33 @@
                 <div class="col-md-4 mb-4">
                     <div class="card rounded-12 shadow h-100">
                         <div class="card-body text-center">
+                            <!-- 卡片信息区域 -->
                             <div class="card-custom-area">
                                 <div class="card-wrapper">
-                                    <div class="card-custom" style="position: relative; width: 350px; height: 220px; border-radius: 15px; background: linear-gradient(135deg, #0d47a1, #1976d2); color: #fff; padding: 20px; margin-bottom: 20px; margin-left: auto; margin-right: auto;">
+                                    <div class="card-custom" style="position: relative; width: 100%; max-width: 350px; height: 220px; border-radius: 15px; background: linear-gradient(135deg, #0d47a1, #1976d2); color: #fff; padding: 20px; margin: 0 auto;">
                                         <div class="card-logo" style="position: absolute; top: 20px; left: 20px;">
                                             <img class="logo" src="{{ get_fav($basic_settings) }}" alt="site-logo" style="width: 40px;">
                                         </div>
-                                        <div class="card-number" style="position: absolute; top: 80px; left: 20px; font-size: 1.3rem; letter-spacing: 2px; font-weight: bold;">
-                                            {{ implode(' ', str_split(@$myCard->card_pan, 4)) }}
+                                        <div id="card-number" style="position: absolute; top: 80px; left: 20px; font-size: 1.3rem; letter-spacing: 2px; font-weight: bold;">
+                                            {{ $myCard->masked_card }}
                                         </div>
-                                        <div class="card-holder" style="position: absolute; bottom: 50px; left: 20px; font-size: 0.9rem;">
-                                            {{ auth()->user()->fullname }}
+                                        <div id="card-holder" style="position: absolute; bottom: 50px; left: 20px; font-size: 0.9rem;">
+                                            {{ $myCard->name_on_card ?? auth()->user()->fullname }}
                                         </div>
-                                        <div class="valid-thru" style="position: absolute; bottom: 20px; left: 20px; font-size: 0.8rem;">
-                                            {{ date('m/Y', strtotime($myCard->expiration)) }}
+                                        <div id="valid-thru" style="position: absolute; bottom: 20px; left: 20px; font-size: 0.8rem;">
+                                            {{ $myCard->masked_expiration }}
                                         </div>
-                                        <div class="card-cvv" style="position: absolute; bottom: 20px; right: 20px; font-size: 0.8rem;">
-                                            CVV: {{ @$myCard->cvv }}
+                                        <div id="card-cvv" style="position: absolute; bottom: 20px; right: 20px; font-size: 0.8rem;">
+                                            CVV: {{ $myCard->masked_cvv }}
                                         </div>
-                                        <div class="card-type" style="position: absolute; top: 20px; right: 20px; font-size: 1rem;">
+                                        <div id="card-type" style="position: absolute; top: 20px; right: 20px; font-size: 1rem;">
                                             {{ __($myCard->card_type == "visa" ? "VISA" : "Mastercard") }}
                                         </div>
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- 卡片操作按钮 -->
                             <div class="card-actions mt-4">
                                 <a href="javascript:void(0)" class="btn btn-outline-primary me-2 fundCard" data-id="{{ $myCard->id }}">充值</a>
                                 <a href="javascript:void(0)" class="btn btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#withdrawModal">转出</a>
@@ -68,10 +71,16 @@
                         </div>
                     </div>
                 </div>
+
                 <!-- 右侧内容 -->
                 <div class="col-md-8 mb-4">
-                    <!-- 左对齐的复制按钮 -->
+                    <!-- 按钮区域 -->
                     <div class="d-flex justify-content-start mb-3">
+                        <!-- 显示完整信息按钮 -->
+                        <button id="showFullCardInfoBtn" class="btn btn-outline-primary me-2">
+                            <i class="fas fa-eye"></i> 显示完整信息
+                        </button>
+                        <!-- 复制信息按钮 -->
                         <button id="copyCardDetailsBtn" class="btn btn-outline-primary">
                             <i class="fas fa-copy"></i> 复制信息
                         </button>
@@ -467,6 +476,28 @@
         // 当点击关闭按钮时，隐藏 Alert
         $('#copySuccessAlert .btn-close').on('click', function() {
             $('#copySuccessAlert').fadeOut();
+        });
+
+        document.getElementById('showFullCardInfoBtn').addEventListener('click', function() {
+            if (confirm('您确定要查看完整的卡片信息吗？')) {
+                fetch('{{ route('user.virtual.card.full.info', $myCard->card_id) }}', {
+                    method: 'GET',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // 更新页面上的信息
+                    document.getElementById('card-number').textContent = data.card_pan;
+                    document.getElementById('valid-thru').textContent = data.expiration;
+                    document.getElementById('card-cvv').textContent = 'CVV: ' + data.cvv;
+                })
+                .catch(error => {
+                    console.error('错误:', error);
+                    alert('获取卡片信息失败，请稍后重试。');
+                });
+            }
         });
     });
 </script>

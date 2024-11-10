@@ -24,7 +24,7 @@
 
                         <ul class="ud-hero-buttons">
                             <li>
-                                <a href="https://links.uideck.com/play-bootstrap-download" rel="nofollow noopener"
+                                <a href="{{setRoute('user.register')}}" rel="nofollow noopener"
                                     target="_blank" class="ud-main-btn ud-white-btn">
                                     {{ __('Start Now') }} </a>
                             </li>

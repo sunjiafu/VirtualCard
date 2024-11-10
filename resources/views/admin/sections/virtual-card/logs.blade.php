@@ -46,7 +46,7 @@
                             <tr>
                                 <td>{{ $item->trx_id }}</td>
                                 <td>
-                                    <a href="{{ setRoute('admin.users.details',$item->user->username) }}"><span class="text-info">{{ $item->user->fullname }}</span></a>
+                                    <a href="{{ setRoute('admin.users.details',$item->user->username) }}"><span class="text-info">{{ $item->user->username }}</span></a>
                                 </td>
 
                                 <td>{{ @$item->remark }}</td>
