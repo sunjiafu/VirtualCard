@@ -131,7 +131,24 @@ class VirtualCardController extends Controller
             $query->where(function ($q) use ($search) {
                 $q->whereHas('user', function ($userQuery) use ($search) {
                     $userQuery->where('username', 'like', "%{$search}%");
-                })->orWhere('card_pan', 'like', "%{$search}%");
+                })
+                ->orWhere(function($q) use ($search) {
+                    // 清理搜索词中的非数字字符
+                    $cleanSearch = preg_replace('/[^0-9]/', '', $search);
+                    if ($cleanSearch) {
+                        // 获取所有卡片并过滤
+                        $cardIds = VirtualCard::all()
+                            ->filter(function($card) use ($cleanSearch) {
+                                $maskedCard = $card->masked_card;
+                                // 检查搜索词是否匹配卡号的前6位或后4位
+                                return str_starts_with($maskedCard, $cleanSearch) || 
+                                       str_ends_with($maskedCard, $cleanSearch);
+                            })
+                            ->pluck('id');
+                        
+                        $q->whereIn('id', $cardIds);
+                    }
+                });
             });
         }
 
@@ -343,7 +360,7 @@ class VirtualCardController extends Controller
             // 提交事务
             DB::commit();
 
-            return redirect()->route('admin.virtual.card.show')->with('success', '卡片已成功删除，余额已退回用户钱包。');
+            return redirect()->route('admin.virtual.card.show')->with('success', '卡片已成功删除，余额退回用��钱包。');
         } catch (\Exception $e) {
             // 回滚事务
             DB::rollBack();
