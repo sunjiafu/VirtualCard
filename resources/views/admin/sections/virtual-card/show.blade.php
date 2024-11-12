@@ -77,7 +77,7 @@
                         <tr>
                             <td>{{ $card->id }}</td>
                             <td>{{ $card->user->username }}</td>
-                            <td>{{ $card->card_pan }}</td>
+                            <td>{{ $card->masked_card }}</td>
                             <td>{{ $card->amount }}</td>
                             <td>{{ $card->card_bin }}</td>
                             <td>

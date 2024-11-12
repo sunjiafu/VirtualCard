@@ -20,6 +20,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Crypt;
 
 class VirtualcardController extends Controller
 {
@@ -276,7 +277,31 @@ class VirtualcardController extends Controller
         $authWallet = $wallet;
         $afterCharge = ($authWallet->balance - $payable);
         $details = [
-            'card_info' => $v_card ?? ''
+            'card_info' => [
+                'user_id' => $v_card->user_id,
+                'card_id' => $v_card->card_id,
+                'ref_id' => $v_card->ref_id,
+                'secret' => $v_card->secret,
+                'bg' => $v_card->bg,
+                'amount' => $v_card->amount,
+                'card_bin' => $v_card->card_bin,
+                'currency' => $v_card->currency,
+                'charge' => $v_card->charge,
+                'is_active' => $v_card->is_active,
+                'funding' => $v_card->funding,
+                'terminate' => $v_card->terminate,
+                'updated_at' => $v_card->updated_at,
+                'created_at' => $v_card->created_at,
+                'id' => $v_card->id,
+                // 原有的加密字段
+                'card_pan' => $v_card->card_pan, // 加密后的 card_pan
+                'cvv' => $v_card->cvv, // 加密后的 cvv
+                'expiration' => $v_card->expiration, // 加密后的 expiration
+                // 新增掩码后的字段
+                'masked_card_pan' => $v_card->masked_card,
+                'masked_cvv' => $v_card->masked_cvv,
+                'masked_expiration' => $v_card->masked_expiration,
+            ],
         ];
         DB::beginTransaction();
         try {
@@ -343,8 +368,33 @@ class VirtualcardController extends Controller
         $trx_id = $trx_id;
         $authWallet = $wallet;
         $afterCharge = ($authWallet->balance - $payable);
+      
         $details = [
-            'card_info' => $myCard ?? ''
+            'card_info' => [
+                'user_id' => $myCard->user_id,
+                'card_id' => $myCard->card_id,
+                'ref_id' => $myCard->ref_id,
+                'secret' => $myCard->secret,
+                'bg' => $myCard->bg,
+                'amount' => $myCard->amount,
+                'card_bin' => $myCard->card_bin,
+                'currency' => $myCard->currency,
+                'charge' => $myCard->charge,
+                'is_active' => $myCard->is_active,
+                'funding' => $myCard->funding,
+                'terminate' => $myCard->terminate,
+                'updated_at' => $myCard->updated_at,
+                'created_at' => $myCard->created_at,
+                'id' => $myCard->id,
+                // 原有的加密字段
+                'card_pan' => $myCard->card_pan, // 加密后的 card_pan
+                'cvv' => $myCard->cvv, // 加密后的 cvv
+                'expiration' => $myCard->expiration, // 加密后的 expiration
+                // 新增掩码后的字段
+                'masked_card_pan' => $myCard->masked_card,
+                'masked_cvv' => $myCard->masked_cvv,
+                'masked_expiration' => $myCard->masked_expiration,
+            ],
         ];
         DB::beginTransaction();
         try {
@@ -452,15 +502,42 @@ class VirtualcardController extends Controller
             return back()->with(['error' => [__('卡片余额不足')]]);
         }
 
+        // 获取转出费用设置
+        $cardWithdrawCharge = TransactionSetting::where('slug', 'card_withdraw')->where('status', 1)->first();
+        $baseCurrency = Currency::default();
+        $rate = $baseCurrency->rate;
+
+        if (!$baseCurrency) {
+            return back()->with(['error' => [__('Default Currency Not Setup Yet')]]);
+        }
+
+        $minLimit = $cardWithdrawCharge->min_limit * $rate;
+        $maxLimit = $cardWithdrawCharge->max_limit * $rate;
+
+        if ($amount < $minLimit || $amount > $maxLimit) {
+            return back()->with(['error' => [__('请输入正确的金额')]]);
+        }
+
+        // 费用计算
+        $fixedCharge = $cardWithdrawCharge->fixed_charge * $rate;
+        $percent_charge = ($amount / 100) * $cardWithdrawCharge->percent_charge;
+        $total_charge = $fixedCharge + $percent_charge;
+        $payable = $amount + $total_charge;
+
+        // 检查卡片余额是否足够覆盖转出金额和费用
+        if ($payable > $myCard->amount) {
+            return back()->with(['error' => [__('对不起，卡片余额不足以覆盖转出金额及费用')]]);
+        }
+
         // 开始数据库事务
         DB::beginTransaction();
 
         try {
-            // 从卡片余额中扣除转出金额
-            $myCard->amount -= $amount;
+            // 从卡片余额中扣除转出金额及费用
+            $myCard->amount -= $payable;
             $myCard->save();
 
-            // 给用户钱包增加金额
+            // 给用户钱包增加转出金额
             $wallet = UserWallet::where('user_id', $user->id)->first();
             $wallet->balance += $amount;
             $wallet->save();
@@ -469,12 +546,13 @@ class VirtualcardController extends Controller
             $trx_id = 'CW' . time() . rand(1000, 9999);
 
             // 调用辅助方法，生成交易记录
-            $this->createTransactionRecords($trx_id, $user, $wallet, $amount, $myCard);
+            $this->createWithdrawTransactionRecords($fixedCharge, $trx_id, $user, $wallet, $amount, $myCard, $total_charge);
 
             // 提交事务
             DB::commit();
 
             return back()->with(['success' => [__('转出成功')]]);
+
         } catch (\Exception $e) {
             // 回滚事务
             DB::rollBack();
@@ -482,8 +560,39 @@ class VirtualcardController extends Controller
         }
     }
 
-    private function createTransactionRecords($trx_id, $user, $wallet, $amount, $myCard)
+    private function createWithdrawTransactionRecords($fixedCharge, $trx_id, $user, $wallet, $amount, $myCard, $total_charge)
     {
+
+        $details = [
+            'card_info' => [
+                'user_id' => $myCard->user_id,
+                'card_id' => $myCard->card_id,
+                'ref_id' => $myCard->ref_id,
+                'secret' => $myCard->secret,
+                'bg' => $myCard->bg,
+                'amount' => $myCard->amount,
+                'card_bin' => $myCard->card_bin,
+                'currency' => $myCard->currency,
+                'charge' => $myCard->charge,
+                'is_active' => $myCard->is_active,
+                'funding' => $myCard->funding,
+                'terminate' => $myCard->terminate,
+                'updated_at' => $myCard->updated_at,
+                'created_at' => $myCard->created_at,
+                'id' => $myCard->id,
+                // 原有的加密字段
+                'card_pan' => $myCard->card_pan, // 加密后的 card_pan
+                'cvv' => $myCard->cvv, // 加密后的 cvv
+                'expiration' => $myCard->expiration, // 加密后的 expiration
+                // 新增掩码后的字段
+                'masked_card_pan' => $myCard->masked_card,
+                'masked_cvv' => $myCard->masked_cvv,
+                'masked_expiration' => $myCard->masked_expiration,
+            ],
+        ];
+      
+
+
         // 创建卡片交易记录
         $cardTransaction = new VirtualCardTransaction();
         $cardTransaction->card_id = $myCard->card_id;
@@ -508,16 +617,35 @@ class VirtualcardController extends Controller
         $transaction->trx_id = $trx_id;
         $transaction->type = PaymentGatewayConst::TYPEVIRTUALCARDWITHDRAW;
         $transaction->request_amount = $amount;
-        $transaction->payable = $amount;
+        $transaction->payable = $payable = $amount + $total_charge;
         $transaction->available_balance = $wallet->balance;
         $transaction->remark = '从卡片转出资金';
         $transaction->status = PaymentGatewayConst::STATUSSUCCESS;
-        $transaction->details = (object)[
-            'card_id' => $myCard->card_id,
-            'card_number' => $myCard->card_number,
-        ];
+        $transaction->details = $details;
         $transaction->reject_reason = null;
         $transaction->save();
+
+        // 记录费用
+        DB::table('transaction_charges')->insert([
+            'transaction_id' => $transaction->id,
+            'percent_charge' => ($total_charge / $amount) * 100, // 假设存储百分比
+            'fixed_charge' => $fixedCharge,
+            'total_charge' => $total_charge,
+            'created_at' => now(),
+        ]);
+
+        // 发送通知
+        $notification_content = [
+            'title' => "Card Withdraw",
+            'message' => __("Card withdraw successful card:") . " " . $myCard->masked_card . ' ' . getAmount($amount, 2) . ' ' . get_default_currency_code(),
+            'image' => files_asset_path('profile-default'),
+        ];
+
+        UserNotification::create([
+            'type' => NotificationConst::CARD_WITHDRAW,
+            'user_id' => $user->id,
+            'message' => $notification_content,
+        ]);
     }
 
     // 所有卡片交易记录

@@ -95,7 +95,12 @@ class VirtualCardController extends Controller
         $transactions = Transaction::with(
             'user:id,firstname,lastname,email,username,full_mobile',
             'currency:id,name',
-        )->where('type', 'VIRTUAL-CARD')->latest()->paginate(20);
+        )->where('type', 'VIRTUAL-CARD')
+            ->orWhere('type', PaymentGatewayConst::CARDBUY)
+            ->orWhere('type', PaymentGatewayConst::CARDFUND)
+            ->orWhere('type', PaymentGatewayConst::TYPEVIRTUALCARDWITHDRAW)
+            ->latest()
+            ->paginate(20);
 
         return view('admin.sections.virtual-card.logs', compact(
             'page_title',

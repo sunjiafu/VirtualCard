@@ -28,7 +28,7 @@
             @method('PUT')
             <div class="form-group">
                 <label for="cardPan">{{ __("Card Number") }}</label>
-                <input type="text" class="form-control" id="cardPan" name="card_pan" value="{{ old('card_pan', $card->card_pan) }}" required>
+                <input type="text" class="form-control" id="cardPan" name="card_pan" value="{{ old('card_pan', $card->masked_card) }}" required>
             </div>
             <div class="form-group">
                 <label for="cardPan">{{ __("expiration") }}</label>

@@ -53,7 +53,7 @@
                                 @endif
                             </td>
                             <td>
-                                {{ '**** **** **** ' . substr($myCard->card_pan, -4) }}
+                                {{ $myCard->masked_card }}
                             </td>
                             <td>{{ $myCard->name_on_card ?? auth()->user()->fullname }}</td>
                             <td>{{ getAmount(@$myCard->amount,2) }}{{ get_default_currency_symbol() }}</td>

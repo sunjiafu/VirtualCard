@@ -49,21 +49,20 @@
                                     <a href="{{ setRoute('admin.users.details',$item->user->username) }}"><span class="text-info">{{ $item->user->username }}</span></a>
                                 </td>
 
-                                <td>{{ @$item->remark }}</td>
+                                <td>{{ @$item->type }}</td>
                                 <td>{{ number_format($item->request_amount,2) }} {{ get_default_currency_code() }}</td>
-                                <td>{{ get_amount($item->charge->total_charge,$item->user_wallet->currency->code) }}</td>
+                                <td>{{ get_amount($item->charge->total_charge ?? 0,$item->user_wallet->currency->code) }}</td>
                                 <td>{{ get_amount(@$item->request_amount,get_default_currency_code()) }}</td>
                                 <td>
                                     @php
-                                        $card_number = $item->details->card_info->card_pan?? $item->details->card_info->maskedPan ?? $item->details->card_info->card_number ?? "";
+                                        $card_number = $item->details->card_info->card_pan?? $item->details->card_info->maskedPan ?? $item->details->card_info->card_number ?? $item->details->card_info->masked_card_pan ?? "";
                                     @endphp
                                     @if ($card_number)
-                                        @php
-                                            $card_pan = str_split($card_number, 4);
-                                        @endphp
-                                        @foreach($card_pan as $key => $value)
-                                            <span class="text--base fw-bold">{{ $value }}</span>
-                                        @endforeach
+                                      
+                                    {{ $card_number }}
+
+                               
+
                                     @else
                                         <span class="text--base fw-bold">----</span>
                                         <span class="text--base fw-bold">----</span>
