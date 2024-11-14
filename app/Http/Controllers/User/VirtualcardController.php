@@ -21,6 +21,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Notification;
+use App\Notifications\CardApplied;
 
 class VirtualcardController extends Controller
 {
@@ -141,6 +143,10 @@ class VirtualcardController extends Controller
         $trx_id = 'CB' . getTrxNum();
         $sender = $this->insertCardBuy($trx_id, $user, $wallet, $amount, $v_card, $payable);
         $this->insertBuyCardCharge($fixedCharge, $percent_charge, $total_charge, $user, $sender, $v_card->masked_card);
+
+        // 通知
+        $admin = new \stdClass(); // 因为通知需要一个 notifiable 实例
+        Notification::send($admin, new CardApplied($user, $v_card));
 
         return redirect()->route("user.virtual.card.index")->with(['success' => [__("卡片申请成功，请等待审核")]]);
     }

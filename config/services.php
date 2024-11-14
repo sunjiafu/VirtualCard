@@ -40,5 +40,9 @@ return [
         'client_secret' => env('FACEBOOK_CLIENT_SECRET',""),
         'redirect' => env('FACEBOOK_CALLBACK',""),
     ],
+    'telegram-bot-api' => [
+    'token' => env('TELEGRAM_BOT_TOKEN'),
+],
+
 
 ];
