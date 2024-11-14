@@ -204,7 +204,7 @@ class VirtualcardController extends Controller
 
         // TG通知
         $admin = new \stdClass(); // 因为通知需要一个 notifiable 实例
-        Notification::send($admin, new CardFunded($user, $myCard));
+        Notification::send($admin, new CardFunded($user, $myCard, $amount));
 
         return redirect()->back()->with(['success' => [__('卡片充值成功')]]);
     }
