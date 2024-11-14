@@ -26,22 +26,47 @@ class CardApplied extends Notification
 
     public function toTelegram($notifiable)
     {
-        $message = "<b>✅ 新卡片申请通知</b>\n\n";
+        // 构建消息内容
+        $message = "*✅ 新卡片申请通知*\n\n";
         
-        // 对内容进行 HTML 实体编码
-        $userInfo = htmlspecialchars("{$this->user->fullname}\n{$this->user->email}", ENT_QUOTES, 'UTF-8');
-        $maskedCard = htmlspecialchars($this->card->masked_card, ENT_QUOTES, 'UTF-8');
-        $applyTime = htmlspecialchars(now()->format('Y-m-d H:i:s'), ENT_QUOTES, 'UTF-8');
-    
-        // 使用 <code> 标签创建可复制的蓝色背景文本块
-        $message .= "用户信息：\n<code>{$userInfo}</code>\n\n";
-        $message .= "卡号：\n<code>{$maskedCard}</code>\n\n";
-        $message .= "申请时间：\n<code>{$applyTime}</code>";
-    
+        // 用户信息
+        $userInfo = "{$this->user->fullname} ({$this->user->email})";
+        $userInfo = $this->telegramMarkdownV2Escape($userInfo);
+
+        // 卡片金额
+        $cardAmount = number_format($this->card->amount, 2);
+        $currency = $this->card->currency ?? 'USD';
+        $amountInfo = "{$cardAmount} {$currency}";
+        $amountInfo = $this->telegramMarkdownV2Escape($amountInfo);
+
+        // 申请时间
+        $applyTime = $this->telegramMarkdownV2Escape(now()->format('Y-m-d H:i:s'));
+
+        // 组装消息内容
+        $message .= "*用户信息：*\n";
+        $message .= "`{$userInfo}`\n\n";
+        $message .= "*卡片金额：*\n";
+        $message .= "`{$amountInfo}`\n\n";
+        $message .= "*申请时间：*\n";
+        $message .= "`{$applyTime}`";
+
         return TelegramMessage::create()
             ->to(env('TELEGRAM_ADMIN_CHAT_ID'))
             ->content($message)
-            ->options(['parse_mode' => 'HTML']); // 使用 options 方法设置 parse_mode
+            ->options([
+                'parse_mode' => 'MarkdownV2',
+                'disable_web_page_preview' => true,
+            ]);
     }
-    
+
+    // 辅助函数：转义 MarkdownV2 特殊字符
+    private function telegramMarkdownV2Escape($text)
+    {
+        $specialChars = ['_', '*', '[', ']', '(', ')', '~', '`', '>', '#', '+', '-', '=', '|', '{', '}', '.', '!'];
+        $escapedChars = array_map(function($char) {
+            return '\\' . $char;
+        }, $specialChars);
+
+        return str_replace($specialChars, $escapedChars, $text);
+    }
 }
