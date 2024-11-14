@@ -64,7 +64,7 @@ class DashboardController extends Controller
     }
 
     public function balanceManagement(){
-        $page_title = __("Balance Management");
+        $page_title = __("余额明细");
         $user = auth()->user();
         $transactions = Transaction::auth()->orderBy('created_at','desc')->paginate(10);
         $totalAddMoney = Transaction::auth()->addMoney()->where('status',1)->sum('request_amount');
