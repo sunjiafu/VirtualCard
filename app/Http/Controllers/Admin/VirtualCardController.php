@@ -232,7 +232,7 @@ class VirtualCardController extends Controller
             ]);
 
             // 仅在交易状态为成功时扣款
-            if ($request->status === PaymentGatewayConst::STATUSSUCCESS) {
+            if ($request->amount <= $card->amount) {
                 $card->amount -= $request->amount;
                 $card->save();
             }
