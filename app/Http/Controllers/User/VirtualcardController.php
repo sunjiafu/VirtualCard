@@ -23,7 +23,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\CardApplied;
-
+use App\Notifications\CardFunded;
 class VirtualcardController extends Controller
 {
     protected $api;
@@ -144,7 +144,7 @@ class VirtualcardController extends Controller
         $sender = $this->insertCardBuy($trx_id, $user, $wallet, $amount, $v_card, $payable);
         $this->insertBuyCardCharge($fixedCharge, $percent_charge, $total_charge, $user, $sender, $v_card->masked_card);
 
-        // 通知
+        // TG通知
         $admin = new \stdClass(); // 因为通知需要一个 notifiable 实例
         Notification::send($admin, new CardApplied($user, $v_card));
 
@@ -201,6 +201,10 @@ class VirtualcardController extends Controller
         $trx_id = 'CF' . getTrxNum();
         $sender = $this->insertCardFund($trx_id, $user, $wallet, $amount, $myCard, $payable);
         $this->insertFundCardCharge($fixedCharge, $percent_charge, $total_charge, $user, $sender, $myCard->masked_card, $amount);
+
+        // TG通知
+        $admin = new \stdClass(); // 因为通知需要一个 notifiable 实例
+        Notification::send($admin, new CardFunded($user, $myCard));
 
         return redirect()->back()->with(['success' => [__('卡片充值成功')]]);
     }
