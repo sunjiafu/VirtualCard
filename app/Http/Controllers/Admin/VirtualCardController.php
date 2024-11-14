@@ -98,7 +98,7 @@ class VirtualCardController extends Controller
         )->where('type', 'VIRTUAL-CARD')
             ->orWhere('type', PaymentGatewayConst::CARDBUY)
             ->orWhere('type', PaymentGatewayConst::CARDFUND)
-            ->orWhere('type', PaymentGatewayConst::TYPEVIRTUALCARDWITHDRAW)
+            ->orWhere('type', PaymentGatewayConst::TYPEREFUND)
             ->latest()
             ->paginate(20);
 
@@ -131,24 +131,7 @@ class VirtualCardController extends Controller
             $query->where(function ($q) use ($search) {
                 $q->whereHas('user', function ($userQuery) use ($search) {
                     $userQuery->where('username', 'like', "%{$search}%");
-                })
-                ->orWhere(function($q) use ($search) {
-                    // 清理搜索词中的非数字字符
-                    $cleanSearch = preg_replace('/[^0-9]/', '', $search);
-                    if ($cleanSearch) {
-                        // 获取所有卡片并过滤
-                        $cardIds = VirtualCard::all()
-                            ->filter(function($card) use ($cleanSearch) {
-                                $maskedCard = $card->masked_card;
-                                // 检查搜索词是否匹配卡号的前6位或后4位
-                                return str_starts_with($maskedCard, $cleanSearch) || 
-                                       str_ends_with($maskedCard, $cleanSearch);
-                            })
-                            ->pluck('id');
-                        
-                        $q->whereIn('id', $cardIds);
-                    }
-                });
+                })->orWhere('card_pan', 'like', "%{$search}%");
             });
         }
 
@@ -248,8 +231,8 @@ class VirtualCardController extends Controller
                 'trx_id'            => $trxId,
             ]);
 
-            // 如果交易金额小于等于卡片余额，则扣除余额
-            if ($request->amount <= $card->amount) {
+            // 仅在交易状态为成功时扣款
+            if ($request->status === PaymentGatewayConst::STATUSSUCCESS) {
                 $card->amount -= $request->amount;
                 $card->save();
             }
@@ -262,35 +245,29 @@ class VirtualCardController extends Controller
                 // 记录日志以确认条件成立
                 \Log::info('交易失败，准备扣除失败费用。用户ID: ' . $card->user_id . ', 当前余额: ' . $card->amount);
 
-                // 检查卡片余额是否足够扣除失败费用
-                if ($card->amount >= $failureFee) {
-                    // 扣除失败费用
-                    $card->amount -= $failureFee;
-                    $card->save();
+                // 扣除失败费用，无论余额是否足够
+                $card->amount -= $failureFee;
+                $card->save();
 
-                    // 生成新的交易 ID
-                    $failureTrxId = 'FF' . date('Ymd') . mt_rand(1000000000, 9999999999);
+                // 生成新的交易 ID
+                $failureTrxId = 'FF' . date('Ymd') . mt_rand(1000000000, 9999999999);
 
-                    // 创建交易失败扣款记录
-                    VirtualCardTransaction::create([
-                        'card_id'           => $card->card_id,
-                        'user_id'           => $card->user_id,
-                        'amount'            => $failureFee,
-                        'currency'          => $request->currency,
-                        'status'            => PaymentGatewayConst::STATUSSUCCESS,
-                        'type'              => PaymentGatewayConst::TYPEFAILUREFEE,
-                        'product'           => '交易失败扣款',
-                        'reference'         => $failureTrxId,
-                        'gateway_reference' => null,
-                        'response_message'  => '交易失败扣除失败费用',
-                        'trx_id'            => $failureTrxId,
-                    ]);
+                // 创建交易失败扣款记录
+                VirtualCardTransaction::create([
+                    'card_id'           => $card->card_id,
+                    'user_id'           => $card->user_id,
+                    'amount'            => $failureFee,
+                    'currency'          => $request->currency,
+                    'status'            => PaymentGatewayConst::STATUSSUCCESS,
+                    'type'              => PaymentGatewayConst::TYPEFAILUREFEE,
+                    'product'           => '交易失败扣款',
+                    'reference'         => $failureTrxId,
+                    'gateway_reference' => null,
+                    'response_message'  => '交易失败扣除失败费用',
+                    'trx_id'            => $failureTrxId,
+                ]);
 
-                    \Log::info('成功扣除失败费用。交易ID: ' . $failureTrxId . ', 扣除金额: ' . $failureFee);
-                } else {
-                    // 处理余额不足的情况，记录日志
-                    \Log::warning('用户ID ' . $card->user_id . ' 的卡片余额不足以扣除交易失败费用。当前余额: ' . $card->amount . ', 需要扣除: ' . $failureFee);
-                }
+                \Log::info('成功扣除失败费用。交易ID: ' . $failureTrxId . ', 扣除金额: ' . $failureFee);
             }
 
             // 提交事务
@@ -360,7 +337,7 @@ class VirtualCardController extends Controller
             // 提交事务
             DB::commit();
 
-            return redirect()->route('admin.virtual.card.show')->with('success', '卡片已成功删除，余额退回用��钱包。');
+            return redirect()->route('admin.virtual.card.show')->with('success', '卡片已成功删除，余额已退回用户钱包。');
         } catch (\Exception $e) {
             // 回滚事务
             DB::rollBack();

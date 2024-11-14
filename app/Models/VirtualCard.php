@@ -31,7 +31,7 @@ class VirtualCard extends Model
         'state' => 'string',
         'zip_code' => 'string',
         'address' => 'string',
-        'amount' => 'double',
+        'amount' => 'decimal:2',
         'currency' => 'string',
         'bg' => 'string',
         'charge' => 'double',
