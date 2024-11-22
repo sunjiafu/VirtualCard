@@ -19,6 +19,26 @@ use App\Models\TransactionCharge;
 
 class ManualVirtualCardService implements VirtualCardServiceInterface
 {
+    public function applyCard($data)
+    {
+        // Implementation for applying a new card
+        return $this->cardBuy($data['user'], $data['amount'], $data['card_bin']);
+    }
+
+    public function rechargeCard($cardId, $amount)
+    {
+        // Implementation for recharging a card
+        $user = Auth::user();
+        return $this->cardFundConfirm($user, $cardId, $amount);
+    }
+
+    public function transferOut($cardId, $amount)
+    {
+        // Implementation for transferring out funds
+        $user = Auth::user();
+        return $this->cardWithdraw($user, $cardId, $amount);
+    }
+
     public function getCards($userId)
     {
         return VirtualCard::where('user_id', $userId)->get();
@@ -299,20 +319,7 @@ class ManualVirtualCardService implements VirtualCardServiceInterface
         });
     }
 
-    public function applyCard($data)
-    {
-        // 手动处理申请虚拟卡的逻辑
-    }
 
-    public function rechargeCard($cardId, $amount)
-    {
-        // 手动处理充值虚拟卡的逻辑
-    }
-
-    public function transferOut($cardId, $amount)
-    {
-        // 手动处理卡片转出操作的逻辑
-    }
 
     public function freezeCard($cardId)
     {
