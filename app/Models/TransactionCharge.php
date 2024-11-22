@@ -8,6 +8,14 @@ use Illuminate\Database\Eloquent\Model;
 class TransactionCharge extends Model
 {
     use HasFactory;
+
+    protected $fillable = [
+        'transaction_id',
+        'percent_charge',
+        'fixed_charge',
+        'total_charge',
+    ];
+    
     protected $casts = [
         'transaction_id' => 'integer',
         'percent_charge' => 'double',

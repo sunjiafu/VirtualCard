@@ -218,6 +218,9 @@ return [
 
         KingFlamez\Rave\RaveServiceProvider::class,
 
+        // 其他服务提供者
+        App\Providers\VirtualCardServiceProvider::class,
+
     ],
 
     /*

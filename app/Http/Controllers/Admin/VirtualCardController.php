@@ -98,7 +98,7 @@ class VirtualCardController extends Controller
         )->where('type', 'VIRTUAL-CARD')
             ->orWhere('type', PaymentGatewayConst::CARDBUY)
             ->orWhere('type', PaymentGatewayConst::CARDFUND)
-            ->orWhere('type', PaymentGatewayConst::TYPEREFUND)
+            ->orWhere('type', PaymentGatewayConst::TYPEVIRTUALCARDWITHDRAW)
             ->latest()
             ->paginate(20);
 

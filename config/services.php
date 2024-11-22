@@ -43,6 +43,9 @@ return [
     'telegram-bot-api' => [
     'token' => env('TELEGRAM_BOT_TOKEN'),
 ],
-
+//是否切换API
+    'virtual_card' => [
+        'use_api' => env('VIRTUAL_CARD_USE_API', false),
+    ],
 
 ];
