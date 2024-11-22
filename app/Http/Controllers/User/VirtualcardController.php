@@ -80,74 +80,6 @@ class VirtualcardController extends Controller
         return view('user.sections.virtual-card.addcard', compact('page_title', 'virtualCardBins'));
     }
 
-    // public function cardBuy(Request $request)
-    // {
-    //     $request->validate([
-    //         'card_amount' => 'required|numeric|gt:0',
-    //         'card_bin' => 'required',
-    //     ]);
-
-    //     $user = auth()->user();
-    //     $amount = $request->card_amount;
-    //     $card_bin = $request->card_bin;
-    //     $wallet = UserWallet::where('user_id', $user->id)->first();
-    //     if (!$wallet) {
-    //         return back()->with(['error' => [__('User wallet not found')]]);
-    //     }
-    //     $cardCharge = TransactionSetting::where('slug', 'virtual_card')->where('status', 1)->first();
-    //     $baseCurrency = Currency::default();
-    //     $rate = $baseCurrency->rate;
-    //     if (!$baseCurrency) {
-    //         return back()->with(['error' => [__('Default Currency Not Setup Yet')]]);
-    //     }
-    //     $minLimit = $cardCharge->min_limit * $rate;
-    //     $maxLimit = $cardCharge->max_limit * $rate;
-    //     if ($amount < $minLimit || $amount > $maxLimit) {
-    //         return back()->with(['error' => [__('Please follow the transaction limit')]]);
-    //     }
-    //     // 费用计算
-    //     $fixedCharge = $cardCharge->fixed_charge * $rate;
-    //     $percent_charge = ($amount / 100) * $cardCharge->percent_charge;
-    //     $total_charge = $fixedCharge + $percent_charge;
-    //     $payable = $total_charge + $amount;
-    //     if ($payable > $wallet->balance) {
-    //         return back()->with(['error' => [__('Sorry, insufficient balance')]]);
-    //     }
-    //     $currency = $baseCurrency->code;
-    //     $trx = 'VC-' . time() . rand(6, 100);
-
-    //     // 生成虚拟卡信息
-    //     $card_pan = "0000 0000 0000 0000";  // 生成虚拟卡号
-    //     $cvv = rand(100, 999);  // 随机生成CVV
-    //     $expiration = date("Y-m", strtotime("+3 years"));  // 有效期为3年后
-
-    //     // 保存虚拟卡信息到数据库
-    //     $v_card = new VirtualCard();
-    //     $v_card->user_id = $user->id;
-    //     $v_card->card_id = $trx;
-    //     $v_card->ref_id = $trx;
-    //     $v_card->secret = $trx;
-    //     $v_card->bg = "DeepBlue";
-    //     $v_card->amount = $amount;
-    //     $v_card->card_bin = $card_bin;
-    //     $v_card->currency = $currency;
-    //     $v_card->charge = $total_charge;
-    //     $v_card->is_active = 0;  // 卡片默认未激活
-    //     $v_card->funding = 1;
-    //     $v_card->terminate = 0;
-    //     $v_card->save();
-
-    //     // 记录交易
-    //     $trx_id = 'CB' . getTrxNum();
-    //     $sender = $this->insertCardBuy($trx_id, $user, $wallet, $amount, $v_card, $payable);
-    //     $this->insertBuyCardCharge($fixedCharge, $percent_charge, $total_charge, $user, $sender, $v_card->masked_card);
-
-    //     // TG通知
-    //     $admin = new \stdClass(); // 因为通知需要一个 notifiable 实例
-    //     Notification::send($admin, new CardApplied($user, $v_card));
-
-    //     return redirect()->route("user.virtual.card.index")->with(['success' => [__("卡片申请成功，请等待审核")]]);
-    // }
 
      /**
      * 处理购买虚拟卡的请求
@@ -173,6 +105,20 @@ class VirtualcardController extends Controller
 
             // 发送TG通知给管理员
             Notification::send($result['admin'], new CardApplied($user, $result['virtual_card']));
+
+            //发送通知给用户
+            $notification_content = [
+                'title' => "Buy Card",
+                'message' => __("Buy card successful"), 
+                'image' => files_asset_path('profile-default'),
+            ];
+
+            UserNotification::create([
+                'type' => NotificationConst::CARD_BUY,
+                'user_id' => $user->id,
+                'message' => $notification_content,
+            ]);
+
 
             return redirect()->route("user.virtual.card.index")->with(['success' => [__("卡片申请成功，请等待审核")]]);
         } catch (Exception $e) {
@@ -275,64 +221,7 @@ class VirtualcardController extends Controller
     }
 
     // 卡片购买辅助方法
-    public function insertCardBuy($trx_id, $user, $wallet, $amount, $v_card, $payable)
-    {
-        $trx_id = $trx_id;
-        $authWallet = $wallet;
-        $afterCharge = ($authWallet->balance - $payable);
-        $details = [
-            'card_info' => [
-                'user_id' => $v_card->user_id,
-                'card_id' => $v_card->card_id,
-                'ref_id' => $v_card->ref_id,
-                'secret' => $v_card->secret,
-                'bg' => $v_card->bg,
-                'amount' => $v_card->amount,
-                'card_bin' => $v_card->card_bin,
-                'currency' => $v_card->currency,
-                'charge' => $v_card->charge,
-                'is_active' => $v_card->is_active,
-                'funding' => $v_card->funding,
-                'terminate' => $v_card->terminate,
-                'updated_at' => $v_card->updated_at,
-                'created_at' => $v_card->created_at,
-                'id' => $v_card->id,
-                // 原有的加密字段
-                'card_pan' => $v_card->card_pan, // 加密后的 card_pan
-                'cvv' => $v_card->cvv, // 加密后的 cvv
-                'expiration' => $v_card->expiration, // 加密后的 expiration
-                // 新增掩码后的字段
-                'masked_card_pan' => $v_card->masked_card,
-                'masked_cvv' => $v_card->masked_cvv,
-                'masked_expiration' => $v_card->masked_expiration,
-            ],
-        ];
-        DB::beginTransaction();
-        try {
-            $id = DB::table("transactions")->insertGetId([
-                'user_id' => $user->id,
-                'user_wallet_id' => $authWallet->id,
-                'payment_gateway_currency_id' => null,
-                'type' => PaymentGatewayConst::CARDBUY,
-                'trx_id' => $trx_id,
-                'request_amount' => $amount,
-                'payable' => $payable,
-                'available_balance' => $afterCharge,
-                'remark' => ucwords(remove_speacial_char(PaymentGatewayConst::CARDBUY, " ")),
-                'details' => json_encode($details),
-                'attribute' => PaymentGatewayConst::RECEIVED,
-                'status' => true,
-                'created_at' => now(),
-            ]);
-            $this->updateSenderWalletBalance($authWallet, $afterCharge);
-
-            DB::commit();
-        } catch (Exception $e) {
-            DB::rollBack();
-            throw new Exception(__("Something Went Wrong! Please Try Again"));
-        }
-        return $id;
-    }
+   
 
     public function insertBuyCardCharge($fixedCharge, $percent_charge, $total_charge, $user, $id, $masked_card)
     {
