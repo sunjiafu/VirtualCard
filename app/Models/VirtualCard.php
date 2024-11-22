@@ -51,7 +51,7 @@ class VirtualCard extends Model
     // 设置器：在保存时加密
     public function setAttribute($key, $value)
     {
-        if (in_array($key, $this->encryptable) && !is_null($value)) {
+        if ($key !== 'card_pan' && in_array($key, $this->encryptable) && !is_null($value)) {
             $value = Crypt::encryptString($value);
         }
 
@@ -125,5 +125,22 @@ class VirtualCard extends Model
     return $this->hasMany(VirtualCardTransaction::class, 'card_id');
 }
 
+    public function setCardPanAttribute($value)
+    {
+        if (!is_null($value)) {
+            // **加密 card_pan**
+            $encryptedValue = Crypt::encryptString($value);
+            $this->attributes['card_pan'] = $encryptedValue;
+
+            // **生成掩码后的卡号并存储到 masked_card**
+            $firstSix = substr($value, 0, 6);
+            $lastFour = substr($value, -4);
+            $masked = $firstSix . str_repeat('*', strlen($value) - 10) . $lastFour;
+            $this->attributes['masked_card'] = $masked;
+        } else {
+            $this->attributes['card_pan'] = null;
+            $this->attributes['masked_card'] = null;
+        }
+    }
 
 }
