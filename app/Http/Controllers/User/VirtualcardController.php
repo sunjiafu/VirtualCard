@@ -194,7 +194,10 @@ class VirtualcardController extends Controller
         $card_id = $request->id;
         $amount = $request->fund_amount;
 
-        $this->virtualCardService->cardFundConfirm($user, $card_id, $amount);
+        $result=$this->virtualCardService->cardFundConfirm($user, $card_id, $amount);
+
+        //发送TG通知给管理员
+        Notification::send($result['admin'], new CardFunded($user, $result['virtual_card'], $amount));
 
    
         return redirect()->back()->with(['success' => [__('卡片充值成功')]]);

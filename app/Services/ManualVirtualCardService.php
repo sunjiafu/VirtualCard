@@ -129,7 +129,7 @@ class ManualVirtualCardService implements VirtualCardServiceInterface
             $transaction = $this->createTransaction($user, $wallet, $amount, $totalCharge, PaymentGatewayConst::CARDBUY, '虚拟卡购买', $virtualCard);
             $this->createCardCharge($fixedCharge,$totalCharge,$percentCharge,$transaction);
 
-            // 假设有一个管理员对象
+            // 实例化一个类
             $admin = new \StdClass();
 
             // 返回结果
@@ -209,10 +209,16 @@ class ManualVirtualCardService implements VirtualCardServiceInterface
 
             $this->createVirtualCardTransaction($transaction,$wallet,$user,$virtualCard, $amount, PaymentGatewayConst::CARDFUND);
 
+            // 实例化一个类
+            $admin = new \StdClass();
 
             // 返回结果
             return [
-                'transaction' => $transaction
+                'transaction' => $transaction,
+                'admin' => $admin,
+                'user' => $user,
+                'virtual_card' => $virtualCard,
+
             ];
         });
     }
@@ -389,6 +395,7 @@ class ManualVirtualCardService implements VirtualCardServiceInterface
             DB::rollBack();
             throw new Exception(__("Something Went Wrong! Please Try Again"));
         }
+
         return [
             'transaction_id' => $id,
             'trx_id' => $trx_id  // 在返回值中包含 trx_id
