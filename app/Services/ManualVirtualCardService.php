@@ -46,7 +46,9 @@ class ManualVirtualCardService implements VirtualCardServiceInterface
 
     public function getCardDetails($cardId)
     {
-        $card = VirtualCard::where('card_id', $cardId)->first();
+
+        $user =Auth::user();
+        $card = VirtualCard::where('user_id',$user->id)->where('card_id',$card_id)->first();
 
         // 获取交易记录
         $transactions = VirtualCardTransaction::where('card_id', $card->card_id)
@@ -96,12 +98,21 @@ class ManualVirtualCardService implements VirtualCardServiceInterface
             if (!$cardCharge) {
                 throw new Exception(__('虚拟卡交易设置未找到'));
             }
+           
+            // 检查用户是否已经达到购买卡片的限制
+            $totalCards = VirtualCard::where('user_id', $user->id)->count();
+            $card_limit = 10;
+        if($totalCards >= $card_limit){
+            throw new Exception(__('你的卡片数量已达到上限'));
+        }
 
             // 获取默认货币
             $baseCurrency = Currency::default();
             if (!$baseCurrency) {
                 throw new Exception(__('默认货币未设置'));
             }
+
+
             $rate = $baseCurrency->rate;
 
             // 检查交易限额
