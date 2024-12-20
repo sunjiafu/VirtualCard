@@ -131,7 +131,9 @@ class VirtualCardController extends Controller
             $query->where(function ($q) use ($search) {
                 $q->whereHas('user', function ($userQuery) use ($search) {
                     $userQuery->where('username', 'like', "%{$search}%");
-                })->orWhere('masked_card', 'like', "%{$search}%");
+                })
+                ->orWhere('masked_card', 'like', "%{$search}%")
+                ->orWhere('card_pan', 'like', "%{$search}%");
             });
         }
 
@@ -450,5 +452,3 @@ class VirtualCardController extends Controller
         return redirect()->route('admin.virtual.card.bins')->with('success', '卡段删除成功');
     }
 }
-
-
